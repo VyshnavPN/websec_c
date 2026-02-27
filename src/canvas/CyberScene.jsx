@@ -1,66 +1,56 @@
-// src/canvas/CyberScene.jsx
 import React, { useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, MeshDistortMaterial, Environment } from '@react-three/drei'
-import { useToolStore } from '../state/useToolStore'
-
-function CyberMesh() {
-  const meshRef = useRef()
-  const [hovered, setHover] = useState(false)
-  const { activeTool, setActiveTool } = useToolStore()
-
-  // Basic rotation animation
-  useFrame((state, delta) => {
-    meshRef.current.rotation.x += delta * 0.2
-    meshRef.current.rotation.y += delta * 0.2
-  })
-
-  // Change color based on the "tool" (just a demo)
-  const colors = {
-    recon: '#00ff88', // Green
-    exploit: '#ff0055', // Red
-    defense: '#00ccff' // Blue
-  }
-
-  return (
-    <mesh 
-      ref={meshRef}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-      onClick={() => setActiveTool(activeTool === 'recon' ? 'exploit' : 'recon')} // Toggle for test
-      scale={hovered ? 1.2 : 1}
-    >
-      <icosahedronGeometry args={[2, 0]} /> {/* The "Star" shape base */}
-      {/* Inside src/canvas/CyberScene.jsx */}
-
-<MeshDistortMaterial 
-  color={activeTool === 'exploit' ? '#ff0033' : '#00ff41'} // Matrix Green vs. Alert Red
-  wireframe={true}  // <--- This turns on the wireframe mode
-  speed={2}         // How fast the "glitch" moves
-  distort={0.6}     // Make it wobble more (like unstable data)
-  roughness={0}
-  metalness={1}
-/>
-    </mesh>
-  )
-}
-
-// src/canvas/CyberScene.jsx
-// ... (imports same as before)
+import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 
 export default function CyberScene() {
+  const meshRef = useRef()
+  const [hovered, setHover] = useState(false)
+
+  useFrame((state) => {
+    // 1. SAFETY: Exit if the mesh hasn't loaded yet
+    if (!meshRef.current) return;
+
+    const time = state.clock.getElapsedTime()
+
+    // 2. STABLE PULSE
+    // We use a fixed base scale of 1.0 to prevent it from disappearing
+    const pulseAmount = Math.sin(time * 1.5) * 0.03
+    meshRef.current.scale.setScalar(1 + pulseAmount)
+
+    // 3. STABLE ROTATION
+    meshRef.current.rotation.y += 0.01
+    meshRef.current.rotation.x += 0.005
+
+    // 4. STABLE LERP (Manual calculation to avoid THREE.MathUtils errors)
+    const targetIntensity = hovered ? 2.5 : 0.8
+    const currentIntensity = meshRef.current.material.emissiveIntensity
+    
+    // Manual lerp: current + (target - current) * speed
+    meshRef.current.material.emissiveIntensity += (targetIntensity - currentIntensity) * 0.05
+
+    // 5. STABLE COLOR LERP
+    const targetColor = new THREE.Color(hovered ? '#00ff41' : '#002200')
+    meshRef.current.material.color.lerp(targetColor, 0.05)
+  })
+
   return (
-    <Canvas camera={{ position: [0, 0, 6], fov: 45 }}> {/* Adjusted Camera */}
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      
-      {/* The Mesh is automatically at [0,0,0] which is center screen */}
-      <CyberMesh /> 
-      
-      <Environment preset="city" />
-      
-      {/* Disable zoom so they don't get lost, enable rotate */}
-      <OrbitControls enableZoom={false} /> 
-    </Canvas>
+    <mesh
+      ref={meshRef}
+      onPointerOver={(e) => {
+        e.stopPropagation() // Prevent events from bubbling up
+        setHover(true)
+      }}
+      onPointerOut={() => setHover(false)}
+    >
+      <icosahedronGeometry args={[2, 1]} /> 
+      <meshStandardMaterial 
+        wireframe 
+        color="#002200" 
+        emissive="#00ff41" 
+        emissiveIntensity={0.8}
+        transparent={true}
+        opacity={0.8}
+      />
+    </mesh>
   )
 }
