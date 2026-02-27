@@ -1,0 +1,29 @@
+/* src/index.css */
+
+/* 1. Kill all browser defaults */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Force HTML and Body to exact screen dimensions */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important; /* No scrollbars */
+  background-color: #000;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* 3. OVERRIDE VITE'S STUBBORN DEFAULTS */
+#root {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important; /* Kills Vite's 1280px limit */
+  display: block !important;  /* Kills Vite's flex centering */
+}

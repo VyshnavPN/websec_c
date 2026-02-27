@@ -1,0 +1,34 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { auth } from '../state/firebase';
+import { signOut } from 'firebase/auth';
+
+export default function Navbar() {
+  const user = auth.currentUser;
+  const linkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '2px' };
+
+  return (
+    <nav style={{ 
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      padding: '2rem 4rem', position: 'absolute', top: 0, width: '100%', 
+      zIndex: 100, pointerEvents: 'auto' 
+    }}>
+      <div style={{ fontWeight: 'bold', letterSpacing: '4px' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
+      </div>
+      <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+        <Link to="/" style={linkStyle}>HOME</Link>
+        <Link to="/tools" style={linkStyle}>TOOLS</Link>
+        {user ? (
+          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: '1px solid #ff0033', color: '#ff0033', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
+            LOGOUT
+          </button>
+        ) : (
+          <Link to="/auth" style={{ ...linkStyle, color: '#00ff41', border: '1px solid #00ff41', padding: '5px 15px' }}>
+            LOGIN_UPLINK
+          </Link>
+        )}
+      </div>
+    </nav>
+  );
+}
