@@ -2,9 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { auth } from '../state/firebase';
 import { signOut } from 'firebase/auth';
+import { useToolStore } from '../state/useToolStore';
+import { getTheme } from '../utils/theme';
 
 export default function Navbar({ themeColor }) {
   const user = auth.currentUser;
+  // if themeColor not passed, derive from store
+  const activeTool = useToolStore((s) => s.activeTool);
+  const { accent } = getTheme(activeTool);
   const linkStyle = {
     color: '#fff',
     textDecoration: 'none',
@@ -25,11 +30,11 @@ export default function Navbar({ themeColor }) {
         <Link to="/" style={linkStyle}>HOME</Link>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
         {user ? (
-          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${themeColor || '#ff0033'}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
+          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${accent}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
             LOGOUT
           </button>
         ) : (
-          <Link to="/auth" style={{ ...linkStyle, color: '#fff', border: `1px solid ${themeColor || '#00ff41'}`, padding: '5px 15px' }}>
+          <Link to="/auth" style={{ ...linkStyle, color: '#fff', border: `1px solid ${accent}`, padding: '5px 15px' }}>
             LOGIN_UPLINK
           </Link>
         )}

@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useToolStore } from '../state/useToolStore';
+import { getTheme } from '../utils/theme';
 
 export default function CyberScene() {
   const meshRef = useRef();
@@ -10,6 +11,7 @@ export default function CyberScene() {
   // store selectors
   const activeTool = useToolStore((state) => state.activeTool);
   const setActiveTool = useToolStore((state) => state.setActiveTool);
+  const { primary: themeColor, accent } = getTheme(activeTool);
 
   // Transition effect on tool change
   useEffect(() => {
@@ -17,9 +19,6 @@ export default function CyberScene() {
       meshRef.current.scale.set(0, 0, 0);
     }
   }, [activeTool]);
-
-  // calculate a theme color for material props
-  const themeColor = activeTool === 'exploit' ? '#571c1c' : '#2a602a';
 
   // rotate + color + grow
   useFrame((state, delta) => {
@@ -43,9 +42,9 @@ export default function CyberScene() {
       0.02 // This is the speed of the "glow"
     );
 
-    // 4. COLOR LERP - now based on activeTool
-    const base = activeTool === 'exploit' ? '#de4f4f' : '#87d187';
-    const hoverTint = hovered ? '#ffffff' : base;
+    // 4. COLOR LERP - now based on palette values
+    const base = themeColor;
+    const hoverTint = hovered ? accent : base;
     const targetColor = new THREE.Color(hoverTint);
     meshRef.current.material.color.lerp(targetColor, 0.1);
   });

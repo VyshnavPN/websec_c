@@ -3,6 +3,7 @@ import { auth } from '../state/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToolStore } from '../state/useToolStore';
+import { getTheme } from '../utils/theme';
 
 
 export default function Auth() {
@@ -12,8 +13,7 @@ export default function Auth() {
   const [error, setError] = useState(''); 
   const navigate = useNavigate();
   const activeTool = useToolStore((s) => s.activeTool);
-  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
-  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
+  const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function Auth() {
 
   const inputStyle = {
     background: 'transparent',
-    border: '1px solid #111',
+    border: `1px solid ${accent}`,
     borderBottom: `1px solid ${themeColor}`,
     color: '#fff',
     padding: '1rem',
@@ -60,7 +60,7 @@ export default function Auth() {
         [ &lt; RETURN_TO_BASE ]
       </Link>
 
-      <div style={{ width: '400px', padding: '3rem', border: '1px solid #111', background: '#050505' }}>
+      <div style={{ width: '400px', padding: '3rem', border: `1px solid ${accent}`, background: panelBg || '#050505' }}>
         <h2 style={{ letterSpacing: '4px', marginBottom: '2rem', fontSize: '1.2rem' }}>
           {isLogin ? '//_SECURE_LOGIN' : '//_ENROLL_NEW_AGENT'}
         </h2>

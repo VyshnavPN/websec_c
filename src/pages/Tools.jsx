@@ -2,24 +2,23 @@ import React from 'react'
 import { Canvas } from '@react-three/fiber'
 import CyberScene from '../canvas/CyberScene'
 import { useToolStore } from '../state/useToolStore'
+import { getTheme } from '../utils/theme'
 
 export default function Tools() {
   const { activeTool, setActiveTool } = useToolStore()
-  // theme matching App.jsx: vivid red/green with deep backgrounds
-  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
-  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
+  const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
 
   // key bump lets us remount canvas on context loss instead of doing full page reload
   const [canvasKey, setCanvasKey] = React.useState(0);
 
-  // Dynamic styling for selection buttons
+  // Dynamic styling for selection buttons using palette colours
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
-    const color = toolName === 'exploit' ? '#ff4444' : '#44ff44';
+    const { primary: toolColor } = getTheme(toolName);
     return {
-      background: isActive ? color : 'transparent',
-      color: isActive ? '#000' : color,
-      border: `1px solid ${color}`,
+      background: isActive ? toolColor : 'transparent',
+      color: isActive ? '#000' : toolColor,
+      border: `1px solid ${toolColor}`,
       padding: '0.6rem 1.2rem',
       cursor: 'pointer',
       fontFamily: 'monospace',
@@ -35,7 +34,7 @@ export default function Tools() {
       width: '100vw', 
       minHeight: '100vh', /* allow extra padding without cutting */
       background: themeBg, 
-      color: '#fff', 
+      color: themeColor, 
       fontFamily: 'monospace',
       /* allow scrolling when content exceeds viewport */
       overflow: 'auto',
@@ -81,7 +80,7 @@ export default function Tools() {
             color: themeColor, 
             opacity: 0.6, 
             fontSize: '0.75rem',
-            borderLeft: `2px solid ${themeColor}`,
+            borderLeft: `2px solid ${accent}`,
             paddingLeft: '10px'
           }}>
             SYSTEM_STATUS: ONLINE <br />
@@ -97,7 +96,7 @@ export default function Tools() {
           justifyContent: 'flex-start', /* start at top so bottom button is reachable */
           padding: '0 4rem',
           gap: '2rem',
-          borderLeft: `1px solid ${themeColor}26`,
+          borderLeft: `1px solid ${accent}33`,
           overflowY: 'auto' /* scroll if not enough vertical space */
         }}>
           
@@ -116,19 +115,19 @@ export default function Tools() {
 
           {/* TOOL HEADER */}
           <div style={{ 
-            border: `1px solid ${activeTool === 'exploit' ? '#ff4444' : '#44ff44'}`, 
+            border: `1px solid ${accent}`, 
             padding: '1.5rem', 
             width: 'fit-content', 
-            background: activeTool === 'exploit' ? 'rgba(255, 68, 68, 0.03)' : 'rgba(68, 255, 68, 0.03)',
-            boxShadow: `inset 0 0 15px ${activeTool === 'exploit' ? 'rgba(255,68,68,0.1)' : 'rgba(68,255,68,0.1)'}`
+            background: panelBg,
+            boxShadow: `inset 0 0 15px ${accent}33`
           }}>
-            <h2 style={{ color: activeTool === 'exploit' ? '#ff4444' : '#44ff44', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
+            <h2 style={{ color: themeColor, margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}
             </h2>
           </div>
           
           {/* TOOL DESCRIPTION */}
-          <p style={{ fontSize: '1rem', lineHeight: '1.8', maxWidth: '450px', color: '#888' }}>
+          <p style={{ fontSize: '1rem', lineHeight: '1.8', maxWidth: '450px', color: accent }}>
             <span style={{ color: themeColor }}>{'>'}</span> Initializing {activeTool} protocols... <br />
             Accessing decentralized nodes for encrypted data packets. 
             The system is currently scanning for vulnerabilities and establishing 
@@ -138,7 +137,7 @@ export default function Tools() {
           {/* ACTION BUTTON */}
           <button style={{
             background: themeColor,
-            border: 'none',
+            border: `2px solid ${accent}`,
             color: '#000',
             padding: '1.2rem 2.8rem',
             cursor: 'pointer',
@@ -147,7 +146,7 @@ export default function Tools() {
             fontWeight: '900',
             fontSize: '0.9rem',
             letterSpacing: '2px',
-            boxShadow: `0 0 25px ${themeColor}33`
+            boxShadow: `0 0 25px ${accent}33`
           }} onClick={() => alert(`CRITICAL: Initiating ${activeTool.toUpperCase()} sequence.`)}>
             LAUNCH_MODULE_V1.0
           </button>

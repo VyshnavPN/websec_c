@@ -1,6 +1,7 @@
 // src/ui/InfoPanel.jsx
 import React from 'react'
 import { useToolStore } from '../state/useToolStore'
+import { getTheme } from '../utils/theme'
 
 export default function InfoPanel() {
   const { activeTool } = useToolStore()
@@ -9,7 +10,7 @@ export default function InfoPanel() {
     recon: "TARGET: RECONNAISSANCE",
     exploit: "TARGET: EXPLOITATION"
   }
-  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+  const { primary: themeColor, accent } = getTheme(activeTool);
 
   return (
     <>
@@ -22,7 +23,7 @@ export default function InfoPanel() {
         color: 'white', 
         pointerEvents: 'none' 
       }}>
-        <h1 style={{ fontSize: '4rem', margin: 0, opacity: 0.1, color: themeColor }}>SYSTEM</h1>
+        <h1 style={{ fontSize: '4rem', margin: 0, opacity: 0.1, color: accent }}>SYSTEM</h1>
         <h1 style={{ fontSize: '4rem', margin: 0, color: themeColor }}>{activeTool.toUpperCase()}</h1>
       </div>
 
@@ -50,7 +51,7 @@ export default function InfoPanel() {
         textAlign: 'center',
         color: 'white' 
       }}>
-        <p style={{ fontSize: '0.8rem', letterSpacing: '1px', color: themeColor }}>
+        <p style={{ fontSize: '0.8rem', letterSpacing: '1px', color: accent }}>
           {content[activeTool]} // STATUS: ACTIVE
         </p>
       </div>

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './state/firebase';
 import { useToolStore } from './state/useToolStore';
+import { getTheme } from './utils/theme';
 
 // Page Imports
 import Home from './pages/Home';
@@ -18,18 +19,16 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const activeTool = useToolStore((s) => s.activeTool);
 
-  // derive colours from current tool using richer hues
-  // red: a deep cherry, green: a vivid lime
-  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
-  // backgrounds are complementary darkened shades with slight warmth
-  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
+  // derive colours from central palette
+  const { primary: themeColor, bg: themeBg } = getTheme(activeTool);
 
   // apply theme to document root for CSS variables
   useEffect(() => {
     document.documentElement.style.setProperty('--theme-primary', themeColor);
     document.documentElement.style.setProperty('--theme-background', themeBg);
+    document.documentElement.style.setProperty('--theme-accent', getTheme(activeTool).accent);
     document.body.style.background = themeBg;
-  }, [themeColor, themeBg]);
+  }, [themeColor, themeBg, activeTool]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
