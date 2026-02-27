@@ -27,8 +27,10 @@ export default function Tools() {
       background: '#000', 
       color: '#fff', 
       fontFamily: 'monospace',
-      overflow: 'hidden',
-      paddingTop: '3.5rem' /* make room for global navbar */
+      /* allow scrolling when content exceeds viewport */
+      overflow: 'auto',
+      paddingTop: '3.5rem', /* make room for global navbar */
+      paddingBottom: '3.5rem' /* avoid content being hidden under bottom */
     }}>
       <div style={{ 
         display: 'grid', 
@@ -69,10 +71,11 @@ export default function Tools() {
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
-          justifyContent: 'center', 
+          justifyContent: 'flex-start', /* start at top so bottom button is reachable */
           padding: '0 4rem',
           gap: '2rem',
-          borderLeft: '1px solid rgba(0, 255, 65, 0.15)'
+          borderLeft: '1px solid rgba(0, 255, 65, 0.15)',
+          overflowY: 'auto' /* scroll if not enough vertical space */
         }}>
           
           {/* MODULE SWITCHER */}

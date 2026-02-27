@@ -26,11 +26,14 @@ export default function CyberScene() {
     meshRef.current.rotation.y += delta * 0.2;
     meshRef.current.rotation.x += delta * 0.1;
 
-    // 2. GROW TRANSITION
-    meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.08);
+    // 2. GROW TRANSITION / hover scale
+    const baseScale = new THREE.Vector3(1, 1, 1);
+    const hoverScale = new THREE.Vector3(1.2, 1.2, 1.2);
+    const targetScale = hovered ? hoverScale : baseScale;
+    meshRef.current.scale.lerp(targetScale, 0.08);
 
     // 3. SLOW HOVER HIGHLIGHT (LERP)
-    const targetIntensity = hovered ? 4.0 : 0.5;
+    const targetIntensity = hovered ? 6.0 : 0.5;
     meshRef.current.material.emissiveIntensity = THREE.MathUtils.lerp(
       meshRef.current.material.emissiveIntensity,
       targetIntensity,
@@ -39,7 +42,7 @@ export default function CyberScene() {
 
     // 4. COLOR LERP
     const targetColor = new THREE.Color(hovered ? '#00ff41' : '#001a00');
-    meshRef.current.material.color.lerp(targetColor, 0.05);
+    meshRef.current.material.color.lerp(targetColor, 0.1);
   });
 
   // Geometry Logic
