@@ -18,9 +18,11 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const activeTool = useToolStore((s) => s.activeTool);
 
-  // derive colors from current tool
-  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
-  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
+  // derive colours from current tool using richer hues
+  // red: a deep cherry, green: a vivid lime
+  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+  // backgrounds are complementary darkened shades with slight warmth
+  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
 
   // apply theme to document root for CSS variables
   useEffect(() => {

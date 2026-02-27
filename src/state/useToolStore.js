@@ -2,6 +2,6 @@
 import { create } from 'zustand'
 
 export const useToolStore = create((set) => ({
-  activeTool: 'recon', // Default state
+  activeTool: 'exploit', // start in exploit mode by default
   setActiveTool: (tool) => set({ activeTool: tool }),
 }))
