@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './state/firebase';
+import { useToolStore } from './state/useToolStore';
 
 // Page Imports
 import Home from './pages/Home';
