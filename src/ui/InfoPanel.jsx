@@ -9,7 +9,7 @@ export default function InfoPanel() {
     recon: "TARGET: RECONNAISSANCE",
     exploit: "TARGET: EXPLOITATION"
   }
-  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
 
   return (
     <>

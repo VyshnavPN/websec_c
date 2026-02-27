@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth';
 export default function Navbar({ themeColor }) {
   const user = auth.currentUser;
   const linkStyle = {
-    color: themeColor || 'white',
+    color: '#fff',
     textDecoration: 'none',
     fontSize: '0.8rem',
     letterSpacing: '2px'
@@ -25,11 +25,11 @@ export default function Navbar({ themeColor }) {
         <Link to="/" style={linkStyle}>HOME</Link>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
         {user ? (
-          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${themeColor || '#ff0033'}`, color: themeColor || '#ff0033', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
+          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${themeColor || '#ff0033'}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
             LOGOUT
           </button>
         ) : (
-          <Link to="/auth" style={{ ...linkStyle, color: themeColor || '#00ff41', border: `1px solid ${themeColor || '#00ff41'}`, padding: '5px 15px' }}>
+          <Link to="/auth" style={{ ...linkStyle, color: '#fff', border: `1px solid ${themeColor || '#00ff41'}`, padding: '5px 15px' }}>
             LOGIN_UPLINK
           </Link>
         )}

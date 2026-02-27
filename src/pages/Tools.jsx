@@ -5,13 +5,14 @@ import { useToolStore } from '../state/useToolStore'
 
 export default function Tools() {
   const { activeTool, setActiveTool } = useToolStore()
-  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
-  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
+  // theme matching App.jsx: vivid red/green with deep backgrounds
+  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
 
   // Dynamic styling for selection buttons
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
-    const color = toolName === 'exploit' ? '#ff0033' : '#00ff41';
+    const color = toolName === 'exploit' ? '#ff4444' : '#44ff44';
     return {
       background: isActive ? color : 'transparent',
       color: isActive ? '#000' : color,
@@ -99,13 +100,13 @@ export default function Tools() {
 
           {/* TOOL HEADER */}
           <div style={{ 
-            border: `1px solid ${activeTool === 'exploit' ? '#ff0033' : '#00ff41'}`, 
+            border: `1px solid ${activeTool === 'exploit' ? '#ff4444' : '#44ff44'}`, 
             padding: '1.5rem', 
             width: 'fit-content', 
-            background: activeTool === 'exploit' ? 'rgba(255, 0, 51, 0.03)' : 'rgba(0, 255, 65, 0.03)',
-            boxShadow: `inset 0 0 15px ${activeTool === 'exploit' ? 'rgba(255,0,51,0.1)' : 'rgba(0,255,65,0.1)'}`
+            background: activeTool === 'exploit' ? 'rgba(255, 68, 68, 0.03)' : 'rgba(68, 255, 68, 0.03)',
+            boxShadow: `inset 0 0 15px ${activeTool === 'exploit' ? 'rgba(255,68,68,0.1)' : 'rgba(68,255,68,0.1)'}`
           }}>
-            <h2 style={{ color: activeTool === 'exploit' ? '#ff0033' : '#00ff41', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
+            <h2 style={{ color: activeTool === 'exploit' ? '#ff4444' : '#44ff44', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}
             </h2>
           </div>

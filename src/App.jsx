@@ -53,7 +53,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000', color: '#00ff41', fontFamily: 'monospace' }}>
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000', color: themeColor, fontFamily: 'monospace' }}>
         [ INITIALIZING_SECURE_SESSION... ]
       </div>
     );

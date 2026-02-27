@@ -41,7 +41,7 @@ export default function CyberScene() {
     );
 
     // 4. COLOR LERP - now based on activeTool
-    const base = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+    const base = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
     const hoverTint = hovered ? '#ffffff' : base;
     const targetColor = new THREE.Color(hoverTint);
     meshRef.current.material.color.lerp(targetColor, 0.1);
@@ -77,8 +77,8 @@ export default function CyberScene() {
       {getGeometry()}
       <meshStandardMaterial 
         wireframe
-        color="#00ff41" 
-        emissive="#00ff41" 
+        color={themeColor} 
+        emissive={themeColor} 
         emissiveIntensity={1}
         transparent
         opacity={0.8}

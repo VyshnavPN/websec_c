@@ -10,8 +10,8 @@ export default function Auth() {
   const [error, setError] = useState(''); 
   const navigate = useNavigate();
   const activeTool = useToolStore((s) => s.activeTool);
-  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
-  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
+  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+  const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ export default function Auth() {
   const inputStyle = {
     background: 'transparent',
     border: '1px solid #111',
-    borderBottom: '1px solid #00ff41',
+    borderBottom: `1px solid ${themeColor}`,
     color: '#fff',
     padding: '1rem',
     fontSize: '0.9rem',
@@ -47,7 +47,7 @@ export default function Auth() {
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: themeBg || '#000', color: themeColor, fontFamily: 'monospace' }}>
+    <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: themeBg || '#000', color: '#fff', fontFamily: 'monospace' }}>
       
       {/* Return Button Floating Top Left */}
       <Link to="/" style={{ 
@@ -67,7 +67,7 @@ export default function Auth() {
           <input type="email" placeholder="EMAIL_UPLINK" style={inputStyle} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" placeholder="ACCESS_CODE" style={inputStyle} onChange={(e) => setPassword(e.target.value)} required />
           
-          {error && <div style={{ color: '#ff0033', fontSize: '0.7rem' }}>{error}</div>}
+          {error && <div style={{ color: '#ff4444', fontSize: '0.7rem' }}>{error}</div>}
 
           <button type="submit" style={{ background: themeColor, color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px' }}>
             {isLogin ? 'INITIALIZE_SESSION' : 'REGISTER_IDENTITY'}
