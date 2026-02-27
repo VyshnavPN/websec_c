@@ -1,13 +1,13 @@
 import React from 'react'
+import { Canvas } from '@react-three/fiber'
 import CyberScene from '../canvas/CyberScene'
 import Navbar from '../components/Navbar'
 import { useToolStore } from '../state/useToolStore'
 
 export default function Tools() {
-  // Pull both the current state and the setter function
   const { activeTool, setActiveTool } = useToolStore()
 
-  // Styling for the Cyber-styled buttons
+  // Dynamic styling for selection buttons
   const getBtnStyle = (toolName) => ({
     background: activeTool === toolName ? '#00ff41' : 'transparent',
     color: activeTool === toolName ? '#000' : '#00ff41',
@@ -38,76 +38,94 @@ export default function Tools() {
         height: 'calc(100% - 80px)' 
       }}>
         
-        {/* LEFT SIDE: 3D CANVAS */}
+        {/* LEFT SIDE: 3D RENDERER */}
         <div style={{ height: '100%', position: 'relative' }}>
-          <CyberScene />
-          {/* Subtle overlay text for 3D view */}
-          <div style={{ position: 'absolute', bottom: '20px', left: '20px', color: '#00ff41', opacity: 0.5, fontSize: '0.8rem' }}>
-            CORE_RENDERER_V3 // ACTIVE_GEOMETRY: {activeTool.toUpperCase()}
+          
+          {/* THE CANVAS: This provides the 3D context for CyberScene */}
+          <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 10, 10]} intensity={1.5} />
+            <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
+            
+            <CyberScene />
+          </Canvas>
+
+          {/* HUD Overlay for the 3D View */}
+          <div style={{ 
+            position: 'absolute', 
+            bottom: '20px', 
+            left: '20px', 
+            color: '#00ff41', 
+            opacity: 0.6, 
+            fontSize: '0.75rem',
+            borderLeft: '2px solid #00ff41',
+            paddingLeft: '10px'
+          }}>
+            SYSTEM_STATUS: ONLINE <br />
+            GEOMETRY_BUFFER: {activeTool.toUpperCase()} <br />
+            RENDER_PIPELINE: V3.0.4
           </div>
         </div>
 
-        {/* RIGHT SIDE: TOOL INTERFACE */}
+        {/* RIGHT SIDE: CONTROL INTERFACE */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
           justifyContent: 'center', 
           padding: '0 4rem',
           gap: '2rem',
-          borderLeft: '1px solid rgba(0, 255, 65, 0.2)'
+          borderLeft: '1px solid rgba(0, 255, 65, 0.15)'
         }}>
           
-          {/* MODULE SELECTOR TABS */}
+          {/* MODULE SWITCHER */}
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button 
-              style={getBtnStyle('recon')} 
-              onClick={() => setActiveTool('recon')}
-            >
-              Recon
+            <button style={getBtnStyle('recon')} onClick={() => setActiveTool('recon')}>
+              [ RECON ]
             </button>
-            <button 
-              style={getBtnStyle('exploit')} 
-              onClick={() => setActiveTool('exploit')}
-            >
-              Exploit
+            <button style={getBtnStyle('exploit')} onClick={() => setActiveTool('exploit')}>
+              [ EXPLOIT ]
             </button>
-            <button 
-              style={getBtnStyle('default')} 
-              onClick={() => setActiveTool('default')}
-            >
-              Reset
+            <button style={getBtnStyle('default')} onClick={() => setActiveTool('default')}>
+              [ RESET ]
             </button>
           </div>
 
-          {/* DYNAMIC HEADER */}
-          <div style={{ border: '1px solid #00ff41', padding: '1.5rem', width: 'fit-content', background: 'rgba(0, 255, 65, 0.05)' }}>
-            <h2 style={{ color: '#00ff41', margin: 0, fontSize: '2rem', letterSpacing: '4px' }}>
+          {/* TOOL HEADER */}
+          <div style={{ 
+            border: '1px solid #00ff41', 
+            padding: '1.5rem', 
+            width: 'fit-content', 
+            background: 'rgba(0, 255, 65, 0.03)',
+            boxShadow: 'inset 0 0 15px rgba(0, 255, 65, 0.1)'
+          }}>
+            <h2 style={{ color: '#00ff41', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}
             </h2>
           </div>
           
-          {/* DYNAMIC DESCRIPTION */}
-          <p style={{ fontSize: '1.1rem', lineHeight: '1.7', maxWidth: '450px', color: '#aaa' }}>
-            Current state: <span style={{ color: '#00ff41' }}>ENCRYPTED_LINK_ESTABLISHED</span><br />
-            Initializing the <span style={{ color: '#fff' }}>{activeTool}</span> logic gate. 
-            All traffic is being routed through secure internal nodes. 
-            Unauthorized use is strictly prohibited under WEBSEC protocols.
+          {/* TOOL DESCRIPTION */}
+          <p style={{ fontSize: '1rem', lineHeight: '1.8', maxWidth: '450px', color: '#888' }}>
+            <span style={{ color: '#00ff41' }}>{'>'}</span> Initializing {activeTool} protocols... <br />
+            Accessing decentralized nodes for encrypted data packets. 
+            The system is currently scanning for vulnerabilities and establishing 
+            a secure bridge to the target environment.
           </p>
 
-          {/* EXECUTION BUTTON */}
+          {/* ACTION BUTTON */}
           <button style={{
             background: '#00ff41',
             border: 'none',
             color: '#000',
-            padding: '1.2rem 2.5rem',
+            padding: '1.2rem 2.8rem',
             cursor: 'pointer',
             width: 'fit-content',
             fontFamily: 'monospace',
             fontWeight: '900',
-            fontSize: '1rem',
-            boxShadow: '0 0 20px rgba(0, 255, 65, 0.3)'
-          }} onClick={() => alert(`SYSTEM_NOTICE: Executing ${activeTool} protocols...`)}>
-            EXECUTE_OPERATIONS_V1.0
+            fontSize: '0.9rem',
+            letterSpacing: '2px',
+            boxShadow: '0 0 25px rgba(0, 255, 65, 0.2)'
+          }} onClick={() => alert(`CRITICAL: Initiating ${activeTool.toUpperCase()} sequence.`)}>
+            LAUNCH_MODULE_V1.0
           </button>
           
         </div>
