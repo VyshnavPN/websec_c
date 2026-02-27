@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { auth } from '../state/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import { useToolStore } from '../state/useToolStore';
+
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);

@@ -9,6 +9,9 @@ export default function Tools() {
   const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
   const themeBg = activeTool === 'exploit' ? '#440000' : '#004400';
 
+  // key bump lets us remount canvas on context loss instead of doing full page reload
+  const [canvasKey, setCanvasKey] = React.useState(0);
+
   // Dynamic styling for selection buttons
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
@@ -50,16 +53,16 @@ export default function Tools() {
           
           {/* THE CANVAS: This provides the 3D context for CyberScene */}
           <Canvas
+            key={canvasKey}
             camera={{ position: [0, 0, 6], fov: 45 }}
             style={{ background: themeBg }}
             gl={{ antialias: true, preserveDrawingBuffer: true }}
             onCreated={({ gl }) => {
-              // listen for lost context and attempt to restore or reload
+              // listen for lost context and bump key to remount canvas
               gl.domElement.addEventListener('webglcontextlost', (e) => {
                 e.preventDefault();
                 console.warn('WebGL context lost');
-                // reload after brief delay to reinitialize context
-                setTimeout(() => window.location.reload(), 1000);
+                setTimeout(() => setCanvasKey(k => k + 1), 1000);
               });
             }}
           >
