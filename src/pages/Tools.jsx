@@ -49,7 +49,20 @@ export default function Tools() {
         <div style={{ height: '100%', position: 'relative' }}>
           
           {/* THE CANVAS: This provides the 3D context for CyberScene */}
-          <Canvas camera={{ position: [0, 0, 6], fov: 45 }} style={{ background: themeBg }}>
+          <Canvas
+            camera={{ position: [0, 0, 6], fov: 45 }}
+            style={{ background: themeBg }}
+            gl={{ antialias: true, preserveDrawingBuffer: true }}
+            onCreated={({ gl }) => {
+              // listen for lost context and attempt to restore or reload
+              gl.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.warn('WebGL context lost');
+                // reload after brief delay to reinitialize context
+                setTimeout(() => window.location.reload(), 1000);
+              });
+            }}
+          >
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
             <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />

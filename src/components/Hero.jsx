@@ -14,7 +14,18 @@ export default function Hero() {
       {/* Background 3D Object - Centered */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         {/* Canvas must wrap any react-three/fiber scene component */}
-        <Canvas camera={{ position: [0, 0, 6], fov: 45 }} style={{ background: themeBg }}>
+        <Canvas
+          camera={{ position: [0, 0, 6], fov: 45 }}
+          style={{ background: themeBg }}
+          gl={{ antialias: true, preserveDrawingBuffer: true }}
+          onCreated={({ gl }) => {
+            gl.domElement.addEventListener('webglcontextlost', (e) => {
+              e.preventDefault();
+              console.warn('WebGL context lost (hero)');
+              setTimeout(() => window.location.reload(), 1000);
+            });
+          }}
+        >
           <ambientLight intensity={0.4} />
           <pointLight position={[10, 10, 10]} intensity={1.5} />
           <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
