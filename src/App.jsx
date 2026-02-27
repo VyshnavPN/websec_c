@@ -7,6 +7,7 @@ import { auth } from './state/firebase';
 import Home from './pages/Home';
 import Tools from './pages/Tools';
 import Auth from './pages/Auth';
+import Navbar from './components/Navbar';
 
 // Styles
 import './style.css';
@@ -45,7 +46,9 @@ export default function App() {
 
   return (
     <Router>
-      <div className="app-container" style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+      {/* global navigation always present */}
+      <Navbar />
+      <div className="app-container" style={{ width: '100vw', height: '100vh', overflow: 'hidden', paddingTop: '3.5rem' }}>
         <Routes>
           {/* Home is the default landing page */}
           <Route path="/" element={<Home />} />

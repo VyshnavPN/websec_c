@@ -1,7 +1,6 @@
 import React from 'react'
 import { Canvas } from '@react-three/fiber'
 import CyberScene from '../canvas/CyberScene'
-import Navbar from '../components/Navbar'
 import { useToolStore } from '../state/useToolStore'
 
 export default function Tools() {
@@ -28,14 +27,13 @@ export default function Tools() {
       background: '#000', 
       color: '#fff', 
       fontFamily: 'monospace',
-      overflow: 'hidden' 
+      overflow: 'hidden',
+      paddingTop: '3.5rem' /* make room for global navbar */
     }}>
-      <Navbar />
-      
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: '1.2fr 1fr', 
-        height: 'calc(100% - 80px)' 
+        height: 'calc(100% - 3.5rem)' 
       }}>
         
         {/* LEFT SIDE: 3D RENDERER */}

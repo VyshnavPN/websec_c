@@ -7,8 +7,9 @@ export default function CyberScene() {
   const meshRef = useRef();
   const [hovered, setHover] = useState(false);
   
-  // Use a selector for better performance
+  // store selectors
   const activeTool = useToolStore((state) => state.activeTool);
+  const setActiveTool = useToolStore((state) => state.setActiveTool);
 
   // Transition effect on tool change
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function CyberScene() {
     }
   }, [activeTool]);
 
+  // rotate + color + grow
   useFrame((state, delta) => {
     if (!meshRef.current) return;
 
@@ -52,20 +54,29 @@ export default function CyberScene() {
     }
   };
 
+  // toggle between the two main tools on click
+  const handleClick = (e) => {
+    e.stopPropagation();
+    if (activeTool === 'recon') setActiveTool('exploit');
+    else setActiveTool('recon');
+  };
+
   return (
     <mesh
       ref={meshRef}
       onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
       onPointerOut={() => setHover(false)}
+      onClick={handleClick}
+      style={{ cursor: 'pointer' }}
     >
       {getGeometry()}
       <meshStandardMaterial 
-        // make the object clearly visible against the pitch‑black background
-        wireframe={false}      // solid geometry looks easier to spot
-        color="#00ff41"      // bright neon green
+        wireframe
+        color="#00ff41" 
         emissive="#00ff41" 
         emissiveIntensity={1}
-        transparent={false}
+        transparent
+        opacity={0.8}
         side={THREE.DoubleSide} 
       />
     </mesh>

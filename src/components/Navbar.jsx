@@ -10,8 +10,8 @@ export default function Navbar() {
   return (
     <nav style={{ 
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '2rem 4rem', position: 'absolute', top: 0, width: '100%', 
-      zIndex: 100, pointerEvents: 'auto' 
+      padding: '2rem 4rem', position: 'fixed', top: 0, left: 0, width: '100%', 
+      zIndex: 100, pointerEvents: 'auto', background: 'rgba(0,0,0,0.4)' 
     }}>
       <div style={{ fontWeight: 'bold', letterSpacing: '4px' }}>
         <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
