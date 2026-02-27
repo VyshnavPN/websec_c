@@ -6,40 +6,37 @@ export default function CyberScene() {
   const meshRef = useRef()
   const [hovered, setHover] = useState(false)
 
-  useFrame((state) => {
-    // 1. SAFETY: Exit if the mesh hasn't loaded yet
-    if (!meshRef.current) return;
+  useFrame((state, delta) => {
+    if (!meshRef.current) return
 
-    const time = state.clock.getElapsedTime()
+    // 1. BASE ROTATION
+    meshRef.current.rotation.y += delta * 0.2
 
-    // 2. STABLE PULSE
-    // We use a fixed base scale of 1.0 to prevent it from disappearing
-    const pulseAmount = Math.sin(time * 1.5) * 0.03
-    meshRef.current.scale.setScalar(1 + pulseAmount)
+    // 2. THE SLOW HOVER CALCULATION (Lerp)
+    // ---------------------------------------------------------
+    // targetValue: where we want to be
+    // speed: how fast we get there (0.02 is very slow/smooth)
+    const targetIntensity = hovered ? 3.5 : 0.5 
+    const speed = 0.02 
 
-    // 3. STABLE ROTATION
-    meshRef.current.rotation.y += 0.01
-    meshRef.current.rotation.x += 0.005
+    // We manually move the intensity toward the target by a tiny fraction each frame
+    meshRef.current.material.emissiveIntensity = THREE.MathUtils.lerp(
+      meshRef.current.material.emissiveIntensity,
+      targetIntensity,
+      speed
+    )
+    // ---------------------------------------------------------
 
-    // 4. STABLE LERP (Manual calculation to avoid THREE.MathUtils errors)
-    const targetIntensity = hovered ? 2.5 : 0.8
-    const currentIntensity = meshRef.current.material.emissiveIntensity
-    
-    // Manual lerp: current + (target - current) * speed
-    meshRef.current.material.emissiveIntensity += (targetIntensity - currentIntensity) * 0.05
-
-    // 5. STABLE COLOR LERP
+    // 3. SLOW COLOR SHIFT
+    // This transitions the wireframe color from dark to bright matrix green
     const targetColor = new THREE.Color(hovered ? '#00ff41' : '#002200')
-    meshRef.current.material.color.lerp(targetColor, 0.05)
+    meshRef.current.material.color.lerp(targetColor, speed)
   })
 
   return (
     <mesh
       ref={meshRef}
-      onPointerOver={(e) => {
-        e.stopPropagation() // Prevent events from bubbling up
-        setHover(true)
-      }}
+      onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
     >
       <icosahedronGeometry args={[2, 1]} /> 
@@ -47,9 +44,9 @@ export default function CyberScene() {
         wireframe 
         color="#002200" 
         emissive="#00ff41" 
-        emissiveIntensity={0.8}
-        transparent={true}
-        opacity={0.8}
+        emissiveIntensity={0.5} // Initial state
+        transparent
+        opacity={0.9}
       />
     </mesh>
   )
