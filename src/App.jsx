@@ -15,6 +15,18 @@ import './style.css';
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const activeTool = useToolStore((s) => s.activeTool);
+
+  // derive colors from current tool
+  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
+
+  // apply theme to document root for CSS variables
+  useEffect(() => {
+    document.documentElement.style.setProperty('--theme-primary', themeColor);
+    document.documentElement.style.setProperty('--theme-background', themeBg);
+    document.body.style.background = themeBg;
+  }, [themeColor, themeBg]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -47,8 +59,8 @@ export default function App() {
   return (
     <Router>
       {/* global navigation always present */}
-      <Navbar />
-      <div className="app-container" style={{ width: '100vw', height: '100vh', overflow: 'hidden', paddingTop: '3.5rem' }}>
+      <Navbar themeColor={themeColor} />
+      <div className="app-container" style={{ width: '100vw', minHeight: '100vh', overflow: 'hidden', paddingTop: '3.5rem', background: themeBg }}>
         <Routes>
           {/* Home is the default landing page */}
           <Route path="/" element={<Home />} />

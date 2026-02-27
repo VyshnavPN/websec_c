@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom';
 import { auth } from '../state/firebase';
 import { signOut } from 'firebase/auth';
 
-export default function Navbar() {
+export default function Navbar({ themeColor }) {
   const user = auth.currentUser;
-  const linkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '2px' };
+  const linkStyle = {
+    color: themeColor || 'white',
+    textDecoration: 'none',
+    fontSize: '0.8rem',
+    letterSpacing: '2px'
+  };
 
   return (
     <nav style={{ 
@@ -14,17 +19,17 @@ export default function Navbar() {
       zIndex: 100, pointerEvents: 'auto', background: 'rgba(0,0,0,0.4)' 
     }}>
       <div style={{ fontWeight: 'bold', letterSpacing: '4px' }}>
-        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
+        <Link to="/" style={{ color: themeColor || 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
       </div>
       <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
         <Link to="/" style={linkStyle}>HOME</Link>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
         {user ? (
-          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: '1px solid #ff0033', color: '#ff0033', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
+          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${themeColor || '#ff0033'}`, color: themeColor || '#ff0033', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
             LOGOUT
           </button>
         ) : (
-          <Link to="/auth" style={{ ...linkStyle, color: '#00ff41', border: '1px solid #00ff41', padding: '5px 15px' }}>
+          <Link to="/auth" style={{ ...linkStyle, color: themeColor || '#00ff41', border: `1px solid ${themeColor || '#00ff41'}`, padding: '5px 15px' }}>
             LOGIN_UPLINK
           </Link>
         )}

@@ -9,6 +9,9 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
   const navigate = useNavigate();
+  const activeTool = useToolStore((s) => s.activeTool);
+  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -44,13 +47,13 @@ export default function Auth() {
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000', color: '#00ff41', fontFamily: 'monospace' }}>
+    <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: themeBg || '#000', color: themeColor, fontFamily: 'monospace' }}>
       
       {/* Return Button Floating Top Left */}
       <Link to="/" style={{ 
-        position: 'absolute', top: '2rem', left: '2rem', color: '#00ff41', 
+        position: 'absolute', top: '2rem', left: '2rem', color: themeColor, 
         textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '2px',
-        border: '1px solid #00ff41', padding: '0.5rem 1rem'
+        border: `1px solid ${themeColor}`, padding: '0.5rem 1rem'
       }}>
         [ &lt; RETURN_TO_BASE ]
       </Link>
@@ -66,7 +69,7 @@ export default function Auth() {
           
           {error && <div style={{ color: '#ff0033', fontSize: '0.7rem' }}>{error}</div>}
 
-          <button type="submit" style={{ background: '#00ff41', color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px' }}>
+          <button type="submit" style={{ background: themeColor, color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px' }}>
             {isLogin ? 'INITIALIZE_SESSION' : 'REGISTER_IDENTITY'}
           </button>
 

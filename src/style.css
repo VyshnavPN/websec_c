@@ -14,7 +14,8 @@ html, body {
   width: 100vw !important;
   height: 100vh !important;
   overflow: hidden !important; /* No scrollbars */
-  background-color: #000;
+  /* use variable set by App effect */
+  background-color: var(--theme-background, #000);
   font-family: 'Courier New', Courier, monospace;
 }
 

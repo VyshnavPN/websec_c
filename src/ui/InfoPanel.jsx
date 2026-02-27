@@ -9,6 +9,7 @@ export default function InfoPanel() {
     recon: "TARGET: RECONNAISSANCE",
     exploit: "TARGET: EXPLOITATION"
   }
+  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
 
   return (
     <>
@@ -21,8 +22,8 @@ export default function InfoPanel() {
         color: 'white', 
         pointerEvents: 'none' 
       }}>
-        <h1 style={{ fontSize: '4rem', margin: 0, opacity: 0.1 }}>SYSTEM</h1>
-        <h1 style={{ fontSize: '4rem', margin: 0 }}>{activeTool.toUpperCase()}</h1>
+        <h1 style={{ fontSize: '4rem', margin: 0, opacity: 0.1, color: themeColor }}>SYSTEM</h1>
+        <h1 style={{ fontSize: '4rem', margin: 0, color: themeColor }}>{activeTool.toUpperCase()}</h1>
       </div>
 
       {/* Bottom Left: Contact Box */}
@@ -49,7 +50,7 @@ export default function InfoPanel() {
         textAlign: 'center',
         color: 'white' 
       }}>
-        <p style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
+        <p style={{ fontSize: '0.8rem', letterSpacing: '1px', color: themeColor }}>
           {content[activeTool]} // STATUS: ACTIVE
         </p>
       </div>

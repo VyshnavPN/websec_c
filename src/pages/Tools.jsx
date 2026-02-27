@@ -5,6 +5,8 @@ import { useToolStore } from '../state/useToolStore'
 
 export default function Tools() {
   const { activeTool, setActiveTool } = useToolStore()
+  const themeColor = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
 
   // Dynamic styling for selection buttons
   const getBtnStyle = (toolName) => {
@@ -28,7 +30,7 @@ export default function Tools() {
     <div style={{ 
       width: '100vw', 
       minHeight: '100vh', /* allow extra padding without cutting */
-      background: '#000', 
+      background: themeBg, 
       color: '#fff', 
       fontFamily: 'monospace',
       /* allow scrolling when content exceeds viewport */
@@ -46,7 +48,7 @@ export default function Tools() {
         <div style={{ height: '100%', position: 'relative' }}>
           
           {/* THE CANVAS: This provides the 3D context for CyberScene */}
-          <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
+          <Canvas camera={{ position: [0, 0, 6], fov: 45 }} style={{ background: themeBg }}>
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
             <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
@@ -59,10 +61,10 @@ export default function Tools() {
             position: 'absolute', 
             bottom: '20px', 
             left: '20px', 
-            color: '#00ff41', 
+            color: themeColor, 
             opacity: 0.6, 
             fontSize: '0.75rem',
-            borderLeft: '2px solid #00ff41',
+            borderLeft: `2px solid ${themeColor}`,
             paddingLeft: '10px'
           }}>
             SYSTEM_STATUS: ONLINE <br />
@@ -78,7 +80,7 @@ export default function Tools() {
           justifyContent: 'flex-start', /* start at top so bottom button is reachable */
           padding: '0 4rem',
           gap: '2rem',
-          borderLeft: '1px solid rgba(0, 255, 65, 0.15)',
+          borderLeft: `1px solid ${themeColor}26`,
           overflowY: 'auto' /* scroll if not enough vertical space */
         }}>
           
@@ -110,7 +112,7 @@ export default function Tools() {
           
           {/* TOOL DESCRIPTION */}
           <p style={{ fontSize: '1rem', lineHeight: '1.8', maxWidth: '450px', color: '#888' }}>
-            <span style={{ color: '#00ff41' }}>{'>'}</span> Initializing {activeTool} protocols... <br />
+            <span style={{ color: themeColor }}>{'>'}</span> Initializing {activeTool} protocols... <br />
             Accessing decentralized nodes for encrypted data packets. 
             The system is currently scanning for vulnerabilities and establishing 
             a secure bridge to the target environment.
@@ -118,7 +120,7 @@ export default function Tools() {
 
           {/* ACTION BUTTON */}
           <button style={{
-            background: '#00ff41',
+            background: themeColor,
             border: 'none',
             color: '#000',
             padding: '1.2rem 2.8rem',
@@ -128,7 +130,7 @@ export default function Tools() {
             fontWeight: '900',
             fontSize: '0.9rem',
             letterSpacing: '2px',
-            boxShadow: '0 0 25px rgba(0, 255, 65, 0.2)'
+            boxShadow: `0 0 25px ${themeColor}33`
           }} onClick={() => alert(`CRITICAL: Initiating ${activeTool.toUpperCase()} sequence.`)}>
             LAUNCH_MODULE_V1.0
           </button>
