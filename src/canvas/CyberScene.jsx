@@ -19,7 +19,7 @@ export default function CyberScene() {
   }, [activeTool]);
 
   // calculate a theme color for material props
-  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+  const themeColor = activeTool === 'exploit' ? '#571c1c' : '#2a602a';
 
   // rotate + color + grow
   useFrame((state, delta) => {
@@ -44,7 +44,7 @@ export default function CyberScene() {
     );
 
     // 4. COLOR LERP - now based on activeTool
-    const base = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+    const base = activeTool === 'exploit' ? '#de4f4f' : '#87d187';
     const hoverTint = hovered ? '#ffffff' : base;
     const targetColor = new THREE.Color(hoverTint);
     meshRef.current.material.color.lerp(targetColor, 0.1);
