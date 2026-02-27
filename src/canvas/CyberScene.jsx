@@ -18,6 +18,9 @@ export default function CyberScene() {
     }
   }, [activeTool]);
 
+  // calculate a theme color for material props
+  const themeColor = activeTool === 'exploit' ? '#ff4444' : '#44ff44';
+
   // rotate + color + grow
   useFrame((state, delta) => {
     if (!meshRef.current) return;
