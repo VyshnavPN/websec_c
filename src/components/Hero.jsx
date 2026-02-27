@@ -4,10 +4,11 @@ import { Canvas } from '@react-three/fiber'
 import CyberScene from '../canvas/CyberScene'
 import InfoPanel from '../ui/InfoPanel'
 import { useToolStore } from '../state/useToolStore'
+import { getTheme } from '../utils/theme'
 
 export default function Hero() {
   const activeTool = useToolStore((s) => s.activeTool);
-  const themeBg = activeTool === 'exploit' ? '#100000' : '#001000';
+  const { bg: themeBg, accent } = getTheme(activeTool);
   const [canvasKey, setCanvasKey] = React.useState(0);
 
   const handleContextLost = (e, gl) => {
