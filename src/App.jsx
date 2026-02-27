@@ -20,7 +20,19 @@ export default function App() {
       setUser(currentUser);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    // fallback: if auth never responds within 5s, unblock UI to avoid permanent black screen
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.warn('Firebase auth timeout – forcing load with user=', user);
+        setLoading(false);
+      }
+    }, 5000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   if (loading) {

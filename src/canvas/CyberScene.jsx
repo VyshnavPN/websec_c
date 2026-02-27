@@ -60,12 +60,12 @@ export default function CyberScene() {
     >
       {getGeometry()}
       <meshStandardMaterial 
-        wireframe 
-        color="#001a00" 
+        // make the object clearly visible against the pitch‑black background
+        wireframe={false}      // solid geometry looks easier to spot
+        color="#00ff41"      // bright neon green
         emissive="#00ff41" 
-        emissiveIntensity={0.5}
-        transparent
-        opacity={0.8}
+        emissiveIntensity={1}
+        transparent={false}
         side={THREE.DoubleSide} 
       />
     </mesh>
