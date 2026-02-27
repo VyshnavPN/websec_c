@@ -40,8 +40,10 @@ export default function CyberScene() {
       0.02 // This is the speed of the "glow"
     );
 
-    // 4. COLOR LERP
-    const targetColor = new THREE.Color(hovered ? '#00ff41' : '#001a00');
+    // 4. COLOR LERP - now based on activeTool
+    const base = activeTool === 'exploit' ? '#ff0033' : '#00ff41';
+    const hoverTint = hovered ? '#ffffff' : base;
+    const targetColor = new THREE.Color(hoverTint);
     meshRef.current.material.color.lerp(targetColor, 0.1);
   });
 

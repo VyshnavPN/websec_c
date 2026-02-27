@@ -7,23 +7,27 @@ export default function Tools() {
   const { activeTool, setActiveTool } = useToolStore()
 
   // Dynamic styling for selection buttons
-  const getBtnStyle = (toolName) => ({
-    background: activeTool === toolName ? '#00ff41' : 'transparent',
-    color: activeTool === toolName ? '#000' : '#00ff41',
-    border: '1px solid #00ff41',
-    padding: '0.6rem 1.2rem',
-    cursor: 'pointer',
-    fontFamily: 'monospace',
-    fontWeight: 'bold',
-    transition: 'all 0.3s ease',
-    textTransform: 'uppercase',
-    letterSpacing: '1px'
-  })
+  const getBtnStyle = (toolName) => {
+    const isActive = activeTool === toolName;
+    const color = toolName === 'exploit' ? '#ff0033' : '#00ff41';
+    return {
+      background: isActive ? color : 'transparent',
+      color: isActive ? '#000' : color,
+      border: `1px solid ${color}`,
+      padding: '0.6rem 1.2rem',
+      cursor: 'pointer',
+      fontFamily: 'monospace',
+      fontWeight: 'bold',
+      transition: 'all 0.3s ease',
+      textTransform: 'uppercase',
+      letterSpacing: '1px'
+    };
+  };
 
   return (
     <div style={{ 
       width: '100vw', 
-      height: '100vh', 
+      minHeight: '100vh', /* allow extra padding without cutting */
       background: '#000', 
       color: '#fff', 
       fontFamily: 'monospace',
@@ -35,7 +39,7 @@ export default function Tools() {
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: '1.2fr 1fr', 
-        height: 'calc(100% - 3.5rem)' 
+        minHeight: 'calc(100vh - 3.5rem)' 
       }}>
         
         {/* LEFT SIDE: 3D RENDERER */}
@@ -93,13 +97,13 @@ export default function Tools() {
 
           {/* TOOL HEADER */}
           <div style={{ 
-            border: '1px solid #00ff41', 
+            border: `1px solid ${activeTool === 'exploit' ? '#ff0033' : '#00ff41'}`, 
             padding: '1.5rem', 
             width: 'fit-content', 
-            background: 'rgba(0, 255, 65, 0.03)',
-            boxShadow: 'inset 0 0 15px rgba(0, 255, 65, 0.1)'
+            background: activeTool === 'exploit' ? 'rgba(255, 0, 51, 0.03)' : 'rgba(0, 255, 65, 0.03)',
+            boxShadow: `inset 0 0 15px ${activeTool === 'exploit' ? 'rgba(255,0,51,0.1)' : 'rgba(0,255,65,0.1)'}`
           }}>
-            <h2 style={{ color: '#00ff41', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
+            <h2 style={{ color: activeTool === 'exploit' ? '#ff0033' : '#00ff41', margin: 0, fontSize: '2.2rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}
             </h2>
           </div>
