@@ -38,8 +38,8 @@ export default function Tools() {
     }}>
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: '1.2fr 1fr', 
-        minHeight: 'calc(100vh - 3.5rem)' 
+        gridTemplateColumns: '1.2fr 1fr' 
+        /* allow content to determine height; outer wrapper scrolls */
       }}>
         
         {/* LEFT SIDE: 3D RENDERER */}
