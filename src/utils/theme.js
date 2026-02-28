@@ -21,9 +21,9 @@ export const themePalettes = {
   audit: {
     // new greyish palette from second image
     primary: '#9b00a1',   // medium grey
-    bg: '#e80000',        // off-white grey
-    accent: '#7cbf00',    // dark charcoal
-    panelBg: 'rgba(0, 0, 83, 0.1)', // translucent grey
+    bg: '#716868',        // off-white grey
+    accent: '#000000',    // dark charcoal
+    panelBg: 'rgba(255, 255, 255, 0.69)', // translucent grey
   }
 };
 
