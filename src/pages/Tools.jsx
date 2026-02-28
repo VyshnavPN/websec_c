@@ -15,8 +15,10 @@ export default function Tools() {
     clearOutput 
   } = useToolStore()
   
+  // Destructure theme colors based on active tool
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   
+  // Local UI State
   const [target, setTarget] = useState('');
   const [subTool, setSubTool] = useState('nmap');
   const [canvasKey, setCanvasKey] = useState(0);
@@ -29,31 +31,43 @@ export default function Tools() {
     }
   }, [output]);
 
-  // reset sub‑tool when switching to recon or clearing output
+  // Reset local states when switching tools
   useEffect(() => {
+    setTarget('');
+    clearOutput();
     if (activeTool === 'recon') {
       setSubTool('nmap');
     }
-  }, [activeTool]);
+  }, [activeTool, clearOutput]);
 
-  // The Live Execution Logic
+  /**
+   * CORE LOGIC: handleExecute
+   * Communicates with the Node.js C2 Backend to spawn Docker containers
+   */
   const handleExecute = async () => {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
     
     setExecuting(true);
     clearOutput();
-    appendOutput(`[INIT] Initializing ${activeTool.toUpperCase()} on ${target}...\n`);
+    appendOutput(`[INIT] Initializing ${activeTool.toUpperCase()} sequence...\n`);
+    appendOutput(`[TARGET] ${target}\n`);
+    appendOutput(`[PIPELINE] Establishing encrypted bridge to C2 server...\n\n`);
 
     try {
-      // REPLACE THIS URL with your hosted backend URL once deployed
+      // Build payload for the backend
       const payload = { target, tool: activeTool };
       if (activeTool === 'recon') payload.subtool = subTool;
-      const response = await fetch('http://localhost:5000/api/scan', {
+
+      // Note: Update 'localhost:5000' to your live API URL when deployed
+      const response = await fetch('websecbackend-production.up.railway.app', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
+      if (!response.ok) throw new Error("SERVER_REJECTED_REQUEST");
+
+      // ReadableStream for line-by-line terminal updates
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -62,13 +76,19 @@ export default function Tools() {
         if (done) break;
         appendOutput(decoder.decode(value));
       }
+      
+      appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
     } catch (error) {
-      appendOutput(`\n[FATAL] C2_LINK_FAILED: Ensure backend server is online.\n`);
+      appendOutput(`\n[FATAL] C2_LINK_FAILED: Ensure backend server and Docker are online.\n`);
+      console.error(error);
     } finally {
       setExecuting(false);
     }
   };
 
+  /**
+   * Tool Switcher Button Styles
+   */
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
     const { primary: toolColor } = getTheme(toolName);
@@ -93,70 +113,74 @@ export default function Tools() {
       background: themeBg, 
       color: themeColor, 
       fontFamily: 'monospace',
-      /* let the body handle overflow */
       paddingTop: '3.5rem', 
-      paddingBottom: '3.5rem' 
+      paddingBottom: '3.5rem',
+      transition: 'background 0.5s ease'
     }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr' }}>
         
-        {/* LEFT SIDE: 3D RENDERER */}
+        {/* LEFT SIDE: 3D ENGINE VIEWPORT */}
         <div style={{ height: '80vh', position: 'relative' }}>
           <Canvas
             key={canvasKey}
             camera={{ position: [0, 0, 6], fov: 45 }}
             gl={{ antialias: true }}
             onCreated={({ gl }) => {
+              // WebGL Context Recovery Logic
               gl.domElement.addEventListener('webglcontextlost', (e) => {
                 e.preventDefault();
+                console.warn('WEBSEC_RENDERER: Context lost. Attempting recovery...');
                 setTimeout(() => setCanvasKey(k => k + 1), 1000);
               });
             }}
           >
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
+            <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
+            
             <CyberScene />
           </Canvas>
 
+          {/* Persistent HUD Overlay */}
           <div style={{ 
             position: 'absolute', bottom: '20px', left: '20px', 
             color: themeColor, opacity: 0.6, fontSize: '0.75rem',
             borderLeft: `2px solid ${accent}`, paddingLeft: '10px'
           }}>
             SYSTEM_STATUS: {isExecuting ? 'EXECUTING...' : 'IDLE'} <br />
-            TARGET_ADDR: {target || 'NONE'} <br />
-            PIPELINE: V3.0.4
+            TARGET_ADDR: {target || 'AWAITING_INPUT'} <br />
+            ACTIVE_GEOMETRY: {activeTool.toUpperCase()} <br />
+            PIPELINE_V3: SECURE_LINK
           </div>
         </div>
 
-        {/* RIGHT SIDE: CONTROL INTERFACE */}
+        {/* RIGHT SIDE: CONTROL PANEL */}
         <div style={{ 
           display: 'flex', flexDirection: 'column', 
           padding: '0 4rem', gap: '1.5rem',
           borderLeft: `1px solid ${accent}33`
         }}>
           
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          {/* TOP NAV: MODULE SELECTION */}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {['recon', 'exploit', 'osint', 'audit'].map(t => (
-              <button key={t} style={getBtnStyle(t)} onClick={() => {
-                setActiveTool(t);
-                setTarget('');
-                clearOutput();
-              }}>
+              <button key={t} style={getBtnStyle(t)} onClick={() => setActiveTool(t)}>
                 [ {t} ]
               </button>
             ))}
           </div>
 
+          {/* DYNAMIC HEADER */}
           <div style={{ border: `1px solid ${accent}`, padding: '1rem', background: panelBg }}>
             <h2 style={{ color: themeColor, margin: 0, fontSize: '1.8rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}{activeTool === 'recon' ? ` - ${subTool.toUpperCase()}` : ''}
             </h2>
           </div>
 
-          {/* SUBTOOL SELECTOR (recon only) */}
+          {/* CONTEXTUAL CONTROLS */}
           {activeTool === 'recon' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_TOOL:</span>
+              <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
               <select
                 value={subTool}
                 onChange={(e) => setSubTool(e.target.value)}
@@ -169,51 +193,54 @@ export default function Tools() {
                   outline: 'none'
                 }}
               >
-                <option value="nmap">nmap</option>
-                <option value="whois">whois</option>
-                <option value="dns">dns</option>
+                <option value="nmap">nmap (Port Discovery)</option>
+                <option value="whois">whois (Domain Registry)</option>
+                <option value="dns">dns (NsLookup)</option>
               </select>
             </div>
           )}
 
-          {/* TARGET INPUT FIELD */}
+          {/* TARGET INPUT */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} DEFINE_TARGET:</span>
             <input 
               type="text"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              placeholder={activeTool === 'audit' ? 'NO_TARGET_REQUIRED' : 'IP_ADDRESS / DOMAIN'}
-              disabled={activeTool === 'audit'}
+              placeholder={activeTool === 'audit' ? 'SCANNING_INTERNAL_NODE...' : 'IP_ADDRESS / DOMAIN'}
+              disabled={activeTool === 'audit' || isExecuting}
               style={{
-                background: activeTool === 'audit' ? '#333' : 'rgba(0,0,0,0.5)',
+                background: activeTool === 'audit' ? '#111' : 'rgba(0,0,0,0.5)',
                 border: `1px solid ${accent}`,
                 padding: '0.8rem',
                 color: themeColor,
                 fontFamily: 'monospace',
-                outline: 'none'
+                outline: 'none',
+                opacity: isExecuting ? 0.5 : 1
               }}
             />
           </div>
           
-          {/* TERMINAL OUTPUT */}
+          {/* TELEMETRY TERMINAL */}
           <div 
             ref={terminalRef}
             style={{ 
-              height: '250px', 
-              background: '#050505', 
+              height: '300px', 
+              background: '#020202', 
               border: `1px solid ${accent}`, 
               padding: '1rem', 
               overflowY: 'auto',
               whiteSpace: 'pre-wrap',
               fontSize: '0.85rem',
               color: accent,
-              boxShadow: `inset 0 0 10px #000`
+              boxShadow: `inset 0 0 20px #000`,
+              lineHeight: '1.4'
             }}
           >
-            {output || 'SYSTEM_READY... AWAITING_COMMAND'}
+            {output || '--- WEBSEC_STRIKE_TERMINAL READY ---'}
           </div>
 
+          {/* ACTION BUTTONS */}
           {activeTool === 'audit' ? (
             <button
               style={{
@@ -228,18 +255,17 @@ export default function Tools() {
                 boxShadow: `0 0 20px ${accent}66`
               }}
               onClick={() => {
-                // trigger download of current output as report
-                const content = output || 'NO_AUDIT_DATA';
+                const content = output || 'NO_AUDIT_DATA_FOUND';
                 const blob = new Blob([content], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'audit-report.txt';
+                a.download = `audit-report-${Date.now()}.txt`;
                 a.click();
                 URL.revokeObjectURL(url);
               }}
             >
-              DOWNLOAD_REPORT
+              DOWNLOAD_FORENSIC_REPORT
             </button>
           ) : (
             <button 
@@ -253,11 +279,12 @@ export default function Tools() {
                 fontWeight: '900',
                 fontSize: '0.9rem',
                 letterSpacing: '2px',
-                boxShadow: isExecuting ? 'none' : `0 0 20px ${accent}66`
+                boxShadow: isExecuting ? 'none' : `0 0 25px ${accent}66`,
+                transition: 'all 0.3s ease'
               }} 
               onClick={handleExecute}
             >
-              {isExecuting ? 'PROCESS_RUNNING...' : 'EXECUTE_STRIKE_V1.0'}
+              {isExecuting ? 'TRANSMITTING_PAYLOAD...' : 'EXECUTE_OPERATIONS_V1.0'}
             </button>
           )}
           
