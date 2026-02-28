@@ -42,7 +42,7 @@ export default function Tools() {
 
   /**
    * CORE LOGIC: handleExecute
-   * Communicates with the Node.js C2 Backend to spawn Docker containers
+   * Communicates with the Node.js C2 Backend on Railway
    */
   const handleExecute = async () => {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
@@ -58,14 +58,17 @@ export default function Tools() {
       const payload = { target, tool: activeTool };
       if (activeTool === 'recon') payload.subtool = subTool;
 
-      // Note: Update 'localhost:5000' to your live API URL when deployed
-      const response = await fetch('websecbackend-production.up.railway.app', {
+      // UPDATED: Correct Railway URL with protocol and endpoint
+      const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error("SERVER_REJECTED_REQUEST");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`SERVER_REJECTED: ${response.status} - ${errorText}`);
+      }
 
       // ReadableStream for line-by-line terminal updates
       const reader = response.body.getReader();
@@ -79,8 +82,9 @@ export default function Tools() {
       
       appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
     } catch (error) {
-      appendOutput(`\n[FATAL] C2_LINK_FAILED: Ensure backend server and Docker are online.\n`);
-      console.error(error);
+      // Detailed error reporting for troubleshooting
+      appendOutput(`\n[FATAL] C2_LINK_FAILED: ${error.message}\n`);
+      console.error("DETAILED_CONNECTION_ERROR:", error); 
     } finally {
       setExecuting(false);
     }
