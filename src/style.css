@@ -11,9 +11,10 @@
 html, body {
   margin: 0 !important;
   padding: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  overflow: hidden !important; /* No scrollbars */
+  /* allow content to grow and scroll when needed */
+  width: 100% !important;
+  height: 100% !important;
+  overflow: auto !important;
   /* use variable set by App effect */
   background-color: var(--theme-background, #000);
   font-family: 'Courier New', Courier, monospace;
@@ -21,8 +22,8 @@ html, body {
 
 /* 3. OVERRIDE VITE'S STUBBORN DEFAULTS */
 #root {
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   max-width: none !important; /* Kills Vite's 1280px limit */

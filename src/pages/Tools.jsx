@@ -78,12 +78,12 @@ export default function Tools() {
 
   return (
     <div style={{ 
-      width: '100vw', 
+      width: '100%',
       minHeight: '100vh', 
       background: themeBg, 
       color: themeColor, 
       fontFamily: 'monospace',
-      overflowX: 'hidden',
+      /* let the body handle overflow */
       paddingTop: '3.5rem', 
       paddingBottom: '3.5rem' 
     }}>

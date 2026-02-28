@@ -62,7 +62,7 @@ export default function App() {
     <Router>
       {/* global navigation always present */}
       <Navbar themeColor={themeColor} />
-      <div className="app-container" style={{ width: '100vw', minHeight: '100vh', overflow: 'hidden', paddingTop: '3.5rem', background: themeBg }}>
+      <div className="app-container" style={{ width: '100%', minHeight: '100vh', overflow: 'auto', paddingTop: '3.5rem', background: themeBg }}>
         <Routes>
           {/* Home is the default landing page */}
           <Route path="/" element={<Home />} />

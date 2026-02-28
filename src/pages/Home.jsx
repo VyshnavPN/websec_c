@@ -8,7 +8,7 @@ export default function Home() {
   const { bg: bgColor, accent } = getTheme(activeTool);
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', background: bgColor, color: accent }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'auto', background: bgColor, color: accent }}>
       <Hero />
       {/* status banner shown when recon or exploit is active */}
       {(activeTool === 'recon' || activeTool === 'exploit') && (
