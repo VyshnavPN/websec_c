@@ -12,21 +12,47 @@ export default function Home() {
       <Hero />
       {/* status banner shown when recon or exploit is active */}
       {(activeTool === 'recon' || activeTool === 'exploit') && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          background: 'rgba(0,0,0,0.3)',
-          padding: '0.4rem 0.8rem',
-          border: `1px solid ${accent}`,
-          borderRadius: '4px',
-          fontFamily: 'monospace',
-          fontSize: '0.85rem',
-          textTransform: 'uppercase',
-          letterSpacing: '1px'
-        }}>
-          {activeTool === 'recon' ? 'RECON MODE ACTIVE' : 'EXPLOIT MODE ACTIVE'}
-        </div>
+        <>
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(0,0,0,0.3)',
+            padding: '0.4rem 0.8rem',
+            border: `1px solid ${accent}`,
+            borderRadius: '4px',
+            fontFamily: 'monospace',
+            fontSize: '0.85rem',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            {activeTool === 'recon' ? 'RECON MODE ACTIVE' : 'EXPLOIT MODE ACTIVE'}
+          </div>
+          {/* larger fixed box on right side for additional info */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            right: '20px',
+            transform: 'translateY(-50%)',
+            width: '180px',
+            minHeight: '100px',
+            background: 'rgba(0,0,0,0.2)',
+            border: `1px solid ${accent}`,
+            padding: '1rem',
+            borderRadius: '6px',
+            fontFamily: 'monospace',
+            fontSize: '0.9rem',
+            color: accent,
+            textAlign: 'center',
+            lineHeight: '1.4'
+          }}>
+            {activeTool === 'recon' ? (
+              <>RECONNAISSANCE MODE<br />ENGAGED</>
+            ) : (
+              <>EXPLOITATION MODE<br />ENGAGED</>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
