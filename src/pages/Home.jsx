@@ -34,22 +34,30 @@ export default function Home() {
             top: '50%',
             right: '20px',
             transform: 'translateY(-50%)',
-            width: '180px',
-            minHeight: '100px',
+            width: '200px',
+            minHeight: '120px',
             background: 'rgba(0,0,0,0.2)',
             border: `1px solid ${accent}`,
             padding: '1rem',
             borderRadius: '6px',
             fontFamily: 'monospace',
-            fontSize: '0.9rem',
+            fontSize: '0.85rem',
             color: accent,
             textAlign: 'center',
             lineHeight: '1.4'
           }}>
             {activeTool === 'recon' ? (
-              <>RECONNAISSANCE MODE<br />ENGAGED</>
+              <>
+                ⚡ RECON MODE<br/>
+                Info gathering &amp; attack surface mapping.<br/>
+                Subdomains, IPs, ports, versions. (Octahedron)
+              </>
             ) : (
-              <>EXPLOITATION MODE<br />ENGAGED</>
+              <>
+                🛠 EXPLOIT MODE<br/>
+                Vulnerability verification &amp; system entry.<br/>
+                Overflows, injections, brute-force. (Torus Knot)
+              </>
             )}
           </div>
         </>
