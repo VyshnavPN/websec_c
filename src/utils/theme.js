@@ -20,10 +20,10 @@ export const themePalettes = {
   },
   audit: {
     // new greyish palette from second image
-    primary: '#15152c',   // medium grey
-    bg: '#4a4a45',        // off-white grey
-    accent: '#6b7853',    // dark charcoal
-    panelBg: 'rgba(109, 109, 113, 0.1)', // translucent grey
+    primary: '#9b00a1',   // medium grey
+    bg: '#e80000',        // off-white grey
+    accent: '#7cbf00',    // dark charcoal
+    panelBg: 'rgba(0, 0, 83, 0.1)', // translucent grey
   }
 };
 
