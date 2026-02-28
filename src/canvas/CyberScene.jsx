@@ -56,15 +56,20 @@ export default function CyberScene() {
         return <octahedronGeometry args={[2.2, 0]} />;
       case 'exploit':
         return <torusKnotGeometry args={[1.2, 0.4, 128, 16]} />;
-      default:
+      case 'osint':
+        // slightly simpler shape for OSINT
         return <icosahedronGeometry args={[2, 1]} />;
+      default:
+        // fallback for audit or any other unexpected value
+        return <dodecahedronGeometry args={[2, 0]} />;
     }
   };
 
-  // toggle between the two main tools on click
+  // rotate through recon → exploit → osint on click (audit is not included)
   const handleClick = (e) => {
     e.stopPropagation();
     if (activeTool === 'recon') setActiveTool('exploit');
+    else if (activeTool === 'exploit') setActiveTool('osint');
     else setActiveTool('recon');
   };
 

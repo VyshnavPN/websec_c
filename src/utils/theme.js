@@ -19,10 +19,10 @@ export const themePalettes = {
     panelBg: 'rgba(30, 144, 255, 0.1)', // translucent blue
   },
   audit: {
-    primary: '#800080',   // purple
-    bg: '#1A001A',        // very dark purple
-    accent: '#FF69B4',    // hot pink
-    panelBg: 'rgba(128, 0, 128, 0.1)', // translucent purple
+    primary: '#31394C',   // dark cold blue from sample
+    bg: '#7A7F84',        // muted grey-blue
+    accent: '#EDEDED',    // light off-white
+    panelBg: 'rgba(49, 57, 76, 0.1)', // translucent version of primary
   }
 };
 
