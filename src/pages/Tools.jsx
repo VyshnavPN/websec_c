@@ -18,6 +18,7 @@ export default function Tools() {
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   
   const [target, setTarget] = useState('');
+  const [subTool, setSubTool] = useState('nmap');
   const [canvasKey, setCanvasKey] = useState(0);
   const terminalRef = useRef(null);
 
@@ -27,6 +28,13 @@ export default function Tools() {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [output]);
+
+  // reset sub‑tool when switching to recon or clearing output
+  useEffect(() => {
+    if (activeTool === 'recon') {
+      setSubTool('nmap');
+    }
+  }, [activeTool]);
 
   // The Live Execution Logic
   const handleExecute = async () => {
@@ -38,10 +46,12 @@ export default function Tools() {
 
     try {
       // REPLACE THIS URL with your hosted backend URL once deployed
+      const payload = { target, tool: activeTool };
+      if (activeTool === 'recon') payload.subtool = subTool;
       const response = await fetch('http://localhost:5000/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target, tool: activeTool })
+        body: JSON.stringify(payload)
       });
 
       const reader = response.body.getReader();
@@ -139,9 +149,32 @@ export default function Tools() {
 
           <div style={{ border: `1px solid ${accent}`, padding: '1rem', background: panelBg }}>
             <h2 style={{ color: themeColor, margin: 0, fontSize: '1.8rem', letterSpacing: '5px' }}>
-              {activeTool.toUpperCase()}
+              {activeTool.toUpperCase()}{activeTool === 'recon' ? ` - ${subTool.toUpperCase()}` : ''}
             </h2>
           </div>
+
+          {/* SUBTOOL SELECTOR (recon only) */}
+          {activeTool === 'recon' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_TOOL:</span>
+              <select
+                value={subTool}
+                onChange={(e) => setSubTool(e.target.value)}
+                style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  border: `1px solid ${accent}`,
+                  padding: '0.8rem',
+                  color: themeColor,
+                  fontFamily: 'monospace',
+                  outline: 'none'
+                }}
+              >
+                <option value="nmap">nmap</option>
+                <option value="whois">whois</option>
+                <option value="dns">dns</option>
+              </select>
+            </div>
+          )}
 
           {/* TARGET INPUT FIELD */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
