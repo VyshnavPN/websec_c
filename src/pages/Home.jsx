@@ -10,8 +10,8 @@ export default function Home() {
   return (
     <div style={{ width: '100%', minHeight: '100vh', position: 'relative', overflow: 'auto', background: bgColor, color: accent }}>
       <Hero />
-      {/* status banner shown when recon or exploit is active */}
-      {(activeTool === 'recon' || activeTool === 'exploit') && (
+      {/* status banner shown when recon, exploit or osint is active */}
+      {(activeTool === 'recon' || activeTool === 'exploit' || activeTool === 'osint') && (
         <>
           <div style={{
             position: 'absolute',
@@ -26,7 +26,7 @@ export default function Home() {
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            {activeTool === 'recon' ? 'RECON MODE ACTIVE' : 'EXPLOIT MODE ACTIVE'}
+            {activeTool === 'recon' ? 'RECON MODE ACTIVE' : activeTool === 'exploit' ? 'EXPLOIT MODE ACTIVE' : 'OSINT MODE ACTIVE'}
           </div>
           {/* larger fixed box on right side for additional info */}
           <div style={{
@@ -52,11 +52,17 @@ export default function Home() {
                 Info gathering &amp; attack surface mapping.<br/>
                 Subdomains, IPs, ports, versions. (Octahedron)
               </>
-            ) : (
+            ) : activeTool === 'exploit' ? (
               <>
                 🛠 EXPLOIT MODE<br/>
                 Vulnerability verification &amp; system entry.<br/>
                 Overflows, injections, brute-force. (Torus Knot)
+              </>
+            ) : (
+              <>
+                🔍 OSINT MODE<br/>
+                Open-source intelligence gathering.<br/>
+                Social data, metadata, public records. (Wireframe)
               </>
             )}
           </div>

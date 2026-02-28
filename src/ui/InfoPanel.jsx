@@ -8,7 +8,9 @@ export default function InfoPanel() {
 
   const content = {
     recon: "TARGET: RECONNAISSANCE",
-    exploit: "TARGET: EXPLOITATION"
+    exploit: "TARGET: EXPLOITATION",
+    osint: "TARGET: OSINT_COLLECTION",
+    audit: "TARGET: AUDIT_REPORT"
   }
   const { primary: themeColor, accent } = getTheme(activeTool);
 

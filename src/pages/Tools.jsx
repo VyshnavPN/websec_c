@@ -126,8 +126,12 @@ export default function Tools() {
         }}>
           
           <div style={{ display: 'flex', gap: '1rem' }}>
-            {['recon', 'exploit', 'default'].map(t => (
-              <button key={t} style={getBtnStyle(t)} onClick={() => setActiveTool(t)}>
+            {['recon', 'exploit', 'osint', 'audit'].map(t => (
+              <button key={t} style={getBtnStyle(t)} onClick={() => {
+                setActiveTool(t);
+                setTarget('');
+                clearOutput();
+              }}>
                 [ {t} ]
               </button>
             ))}
@@ -146,9 +150,10 @@ export default function Tools() {
               type="text"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              placeholder="IP_ADDRESS / DOMAIN"
+              placeholder={activeTool === 'audit' ? 'NO_TARGET_REQUIRED' : 'IP_ADDRESS / DOMAIN'}
+              disabled={activeTool === 'audit'}
               style={{
-                background: 'rgba(0,0,0,0.5)',
+                background: activeTool === 'audit' ? '#333' : 'rgba(0,0,0,0.5)',
                 border: `1px solid ${accent}`,
                 padding: '0.8rem',
                 color: themeColor,
@@ -176,23 +181,52 @@ export default function Tools() {
             {output || 'SYSTEM_READY... AWAITING_COMMAND'}
           </div>
 
-          <button 
-            disabled={isExecuting}
-            style={{
-              background: isExecuting ? 'transparent' : themeColor,
-              border: `2px solid ${accent}`,
-              color: isExecuting ? accent : '#000',
-              padding: '1.2rem',
-              cursor: isExecuting ? 'not-allowed' : 'pointer',
-              fontWeight: '900',
-              fontSize: '0.9rem',
-              letterSpacing: '2px',
-              boxShadow: isExecuting ? 'none' : `0 0 20px ${accent}66`
-            }} 
-            onClick={handleExecute}
-          >
-            {isExecuting ? 'PROCESS_RUNNING...' : 'EXECUTE_STRIKE_V1.0'}
-          </button>
+          {activeTool === 'audit' ? (
+            <button
+              style={{
+                background: themeColor,
+                border: `2px solid ${accent}`,
+                color: '#000',
+                padding: '1.2rem',
+                cursor: 'pointer',
+                fontWeight: '900',
+                fontSize: '0.9rem',
+                letterSpacing: '2px',
+                boxShadow: `0 0 20px ${accent}66`
+              }}
+              onClick={() => {
+                // trigger download of current output as report
+                const content = output || 'NO_AUDIT_DATA';
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audit-report.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              DOWNLOAD_REPORT
+            </button>
+          ) : (
+            <button 
+              disabled={isExecuting}
+              style={{
+                background: isExecuting ? 'transparent' : themeColor,
+                border: `2px solid ${accent}`,
+                color: isExecuting ? accent : '#000',
+                padding: '1.2rem',
+                cursor: isExecuting ? 'not-allowed' : 'pointer',
+                fontWeight: '900',
+                fontSize: '0.9rem',
+                letterSpacing: '2px',
+                boxShadow: isExecuting ? 'none' : `0 0 20px ${accent}66`
+              }} 
+              onClick={handleExecute}
+            >
+              {isExecuting ? 'PROCESS_RUNNING...' : 'EXECUTE_STRIKE_V1.0'}
+            </button>
+          )}
           
         </div>
       </div>
