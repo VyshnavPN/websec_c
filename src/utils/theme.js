@@ -19,10 +19,11 @@ export const themePalettes = {
     panelBg: 'rgba(30, 144, 255, 0.1)', // translucent blue
   },
   audit: {
-    primary: '#31394C',   // dark cold blue from sample
-    bg: '#7A7F84',        // muted grey-blue
-    accent: '#EDEDED',    // light off-white
-    panelBg: 'rgba(49, 57, 76, 0.1)', // translucent version of primary
+    // new greyish palette from second image
+    primary: '#6D6D71',   // medium grey
+    bg: '#E3E3DB',        // off-white grey
+    accent: '#373A3E',    // dark charcoal
+    panelBg: 'rgba(109, 109, 113, 0.1)', // translucent grey
   }
 };
 

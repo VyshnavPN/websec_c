@@ -59,8 +59,10 @@ export default function CyberScene() {
       case 'osint':
         // slightly simpler shape for OSINT
         return <icosahedronGeometry args={[2, 1]} />;
+      case 'audit':
+        return <boxGeometry args={[2, 2, 2]} />; // cube for audit
       default:
-        // fallback for audit or any other unexpected value
+        // fallback shape
         return <dodecahedronGeometry args={[2, 0]} />;
     }
   };
