@@ -59,11 +59,12 @@ export default function Tools() {
       if (activeTool === 'recon') payload.subtool = subTool;
 
       // UPDATED: Correct Railway URL with protocol and endpoint
-      const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+// Inside Tools.jsx
+const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ target, tool: activeTool })
+});
 
       if (!response.ok) {
         const errorText = await response.text();
