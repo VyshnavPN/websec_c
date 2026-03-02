@@ -15,23 +15,19 @@ export default function Tools() {
     clearOutput 
   } = useToolStore()
   
-  // Destructure theme colors based on active tool
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   
-  // Local UI State
   const [target, setTarget] = useState('');
   const [subTool, setSubTool] = useState('nmap');
   const [canvasKey, setCanvasKey] = useState(0);
   const terminalRef = useRef(null);
 
-  // Auto-scroll terminal to bottom when output updates
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [output]);
 
-  // Reset local states when switching tools
   useEffect(() => {
     setTarget('');
     clearOutput();
@@ -42,7 +38,7 @@ export default function Tools() {
 
   /**
    * CORE LOGIC: handleExecute
-   * Communicates with the Node.js C2 Backend on Railway
+   * Fixed payload delivery to ensure subtools (whois/dns) trigger correctly.
    */
   const handleExecute = async () => {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
@@ -54,24 +50,24 @@ export default function Tools() {
     appendOutput(`[PIPELINE] Establishing encrypted bridge to C2 server...\n\n`);
 
     try {
-      // Build payload for the backend
-      const payload = { target, tool: activeTool };
-      if (activeTool === 'recon') payload.subtool = subTool;
+      // FIX: Ensure the payload object is constructed with all necessary parameters
+      const payload = { 
+        target, 
+        tool: activeTool,
+        subtool: activeTool === 'recon' ? subTool : null 
+      };
 
-      // UPDATED: Correct Railway URL with protocol and endpoint
-// Inside Tools.jsx
-const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ target, tool: activeTool })
-});
+      const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload) // SENDING COMPLETE PAYLOAD
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`SERVER_REJECTED: ${response.status} - ${errorText}`);
       }
 
-      // ReadableStream for line-by-line terminal updates
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -83,7 +79,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
       
       appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
     } catch (error) {
-      // Detailed error reporting for troubleshooting
       appendOutput(`\n[FATAL] C2_LINK_FAILED: ${error.message}\n`);
       console.error("DETAILED_CONNECTION_ERROR:", error); 
     } finally {
@@ -91,9 +86,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
     }
   };
 
-  /**
-   * Tool Switcher Button Styles
-   */
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
     const { primary: toolColor } = getTheme(toolName);
@@ -131,7 +123,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
             camera={{ position: [0, 0, 6], fov: 45 }}
             gl={{ antialias: true }}
             onCreated={({ gl }) => {
-              // WebGL Context Recovery Logic
               gl.domElement.addEventListener('webglcontextlost', (e) => {
                 e.preventDefault();
                 console.warn('WEBSEC_RENDERER: Context lost. Attempting recovery...');
@@ -142,11 +133,9 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
             <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
-            
             <CyberScene />
           </Canvas>
 
-          {/* Persistent HUD Overlay */}
           <div style={{ 
             position: 'absolute', bottom: '20px', left: '20px', 
             color: themeColor, opacity: 0.6, fontSize: '0.75rem',
@@ -166,7 +155,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
           borderLeft: `1px solid ${accent}33`
         }}>
           
-          {/* TOP NAV: MODULE SELECTION */}
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {['recon', 'exploit', 'osint', 'audit'].map(t => (
               <button key={t} style={getBtnStyle(t)} onClick={() => setActiveTool(t)}>
@@ -175,14 +163,12 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
             ))}
           </div>
 
-          {/* DYNAMIC HEADER */}
           <div style={{ border: `1px solid ${accent}`, padding: '1rem', background: panelBg }}>
             <h2 style={{ color: themeColor, margin: 0, fontSize: '1.8rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}{activeTool === 'recon' ? ` - ${subTool.toUpperCase()}` : ''}
             </h2>
           </div>
 
-          {/* CONTEXTUAL CONTROLS */}
           {activeTool === 'recon' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
@@ -200,12 +186,11 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
               >
                 <option value="nmap">nmap (Port Discovery)</option>
                 <option value="whois">whois (Domain Registry)</option>
-                <option value="dns">dns (NsLookup)</option>
+                <option value="dns">dns (Host Lookup)</option>
               </select>
             </div>
           )}
 
-          {/* TARGET INPUT */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} DEFINE_TARGET:</span>
             <input 
@@ -226,7 +211,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
             />
           </div>
           
-          {/* TELEMETRY TERMINAL */}
           <div 
             ref={terminalRef}
             style={{ 
@@ -245,7 +229,6 @@ const response = await fetch('https://websecbackend-production.up.railway.app/ap
             {output || '--- WEBSEC_STRIKE_TERMINAL READY ---'}
           </div>
 
-          {/* ACTION BUTTONS */}
           {activeTool === 'audit' ? (
             <button
               style={{
