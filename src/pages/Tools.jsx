@@ -64,18 +64,29 @@ export default function Tools() {
         throw new Error(`SERVER_REJECTED: ${response.status} - ${errorText}`);
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedOutput = ''; // Track full string for parsing
+      let accumulatedOutput = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        accumulatedOutput += chunk;
-        appendOutput(chunk);
+      // attempt streaming first (not all environments support it)
+      if (response.body && response.body.getReader) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          accumulatedOutput += chunk;
+          appendOutput(chunk);
+        }
+      } else {
+        // fallback for non-streaming (some browsers / servers)
+        accumulatedOutput = await response.text();
+        appendOutput(accumulatedOutput);
       }
-      
+
+      // debug info about what we fetched
+      console.log('handleExecute done reading, activeTool=', activeTool, 'subTool=', subTool);
+      console.log('raw accumulatedOutput:', accumulatedOutput);
+
       // --- 3D VISUALIZATION LOGIC ---
       if (activeTool === 'recon' && subTool === 'dns') {
         // Parse the accumulated text for DNS records. Host output can vary between
