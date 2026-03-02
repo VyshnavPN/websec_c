@@ -46,6 +46,11 @@ export default function Tools() {
     console.debug('TOOLS_PAGE: activeTool=', activeTool, 'subTool=', subTool);
   }, [activeTool, clearOutput]);
 
+  // log actual subTool whenever it changes (so we know the state update took effect)
+  useEffect(() => {
+    console.debug('TOOLS_PAGE: subTool updated =>', subTool);
+  }, [subTool]);
+
   /**
    * CORE LOGIC: handleExecute
    * Orchestrates the bridge between Vercel and Railway C2
@@ -187,6 +192,10 @@ export default function Tools() {
             <h2 style={{ color: themeColor, margin: 0, fontSize: '1.8rem', letterSpacing: '5px' }}>
               {activeTool.toUpperCase()}{activeTool === 'recon' || activeTool === 'exploit' ? ` - ${subTool.toUpperCase()}` : ''}
             </h2>
+            {/* debug display of current subTool for visibility */}
+            <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+              DEBUG_SUBTOOL: {subTool}
+            </div>
           </div>
 
           {/* Contextual Subtool Selector (always rendered for debugging) */}
@@ -195,7 +204,15 @@ export default function Tools() {
             <select
               value={subTool}
               onChange={(e) => setSubTool(e.target.value)}
-              style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${accent}`, padding: '0.8rem', color: themeColor, fontFamily: 'monospace' }}
+              style={{
+                background: 'rgba(0,0,0,0.7)',
+                border: `2px solid ${accent}`,
+                padding: '0.8rem',
+                color: '#fff',
+                minWidth: '180px',
+                fontFamily: 'monospace',
+                zIndex: 10
+              }}
             >
               {activeTool === 'recon' ? (
                 <>
