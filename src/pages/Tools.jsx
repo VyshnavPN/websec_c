@@ -245,7 +245,19 @@ export default function Tools() {
           </div>
           
           <div ref={terminalRef} style={{ height: '300px', background: '#020202', border: `1px solid ${accent}`, padding: '1rem', overflowY: 'auto', whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: accent }}>
-            {output || '--- WEBSEC_STRIKE_TERMINAL READY ---'}
+            {output ? (
+              output.split('\n').map((line, idx) => {
+                let style = {};
+                if (line.startsWith('[SAFE]')) style = { color: '#7CFC00' }; // lawn green
+                else if (line.startsWith('[VULN]')) style = { color: '#FF4500' }; // orange red
+                else if (line.startsWith('[ERROR]')) style = { color: '#FFD700' }; // gold
+                else if (line.startsWith('[FATAL]') || line.startsWith('[SYSTEM_ERROR]')) style = { color: '#FFA500' };
+                else if (line.startsWith('[SUCCESS]')) style = { color: '#00FF00' };
+                return (<div key={idx} style={style}>{line || '\u00A0'}</div>);
+              })
+            ) : (
+              '--- WEBSEC_STRIKE_TERMINAL READY ---'
+            )}
           </div>
 
           <button 
