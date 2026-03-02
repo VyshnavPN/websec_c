@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import CyberScene from '../canvas/CyberScene'
+import { OrbitControls } from '@react-three/drei';
 import { useToolStore } from '../state/useToolStore'
 import { getTheme } from '../utils/theme'
 
@@ -153,6 +154,8 @@ export default function Tools() {
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
             <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
+            {/* allow user to orbit/zoom the scene */}
+            <OrbitControls enablePan={false} enableZoom={true} />
             <CyberScene />
           </Canvas>
 

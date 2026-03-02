@@ -8,6 +8,7 @@ import DnsNodes from './DnsNodes'; // 1. Import the new component
 
 export default function CyberScene() {
   const meshRef = useRef();
+  const dnsRef = useRef(); // reference to the DNS node group
   const [hovered, setHover] = useState(false);
   
   const activeTool = useToolStore((state) => state.activeTool);
@@ -47,6 +48,12 @@ export default function CyberScene() {
 
     const targetColor = new THREE.Color(hovered ? accent : themeColor);
     meshRef.current.material.color.lerp(targetColor, 0.1);
+
+    // rotate DNS sphere slowly to reveal depth
+    if (dnsRef.current && dnsData && dnsData.length > 0) {
+      dnsRef.current.rotation.y += delta * 0.3;
+      dnsRef.current.rotation.x += delta * 0.15;
+    }
   });
 
   const getGeometry = () => {
@@ -90,7 +97,9 @@ export default function CyberScene() {
       {/* 5. THE VISUAL DNS MAP */}
       {/* We wrap it in a Float to give it a "floating in space" look */}
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-        <DnsNodes />
+        <group ref={dnsRef}>
+          <DnsNodes />
+        </group>
       </Float>
     </>
   );
