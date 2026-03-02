@@ -77,8 +77,12 @@ export default function CyberScene() {
   };
 
   const hasDns = dnsData && dnsData.length > 0;
+  // text should only be presented when there's no DNS data and we actually
+  // have output from a recon run; excluding exploit/osint prevents the huge
+  // red wall-of-text that covers the canvas.
   const hasText = !hasDns && output && output.trim().length > 0;
-  const displayOutput = hasText
+  const show3DText = hasText && activeTool === 'recon';
+  const displayOutput = show3DText
     ? output.split('\n').slice(-20).join('\n')
     : '';
 
@@ -109,7 +113,7 @@ export default function CyberScene() {
           <group ref={dnsRef}>
             <DnsNodes />
           </group>
-        ) : hasText ? (
+        ) : show3DText ? (
           <Text
             fontSize={0.24}
             color={themeColor}
