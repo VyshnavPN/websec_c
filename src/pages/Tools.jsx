@@ -20,8 +20,7 @@ export default function Tools() {
   // Store Selectors for Conditional UI
   const dnsData = useToolStore((s) => s.dnsData);
   const hasDns = dnsData && dnsData.length > 0;
-  const hasText = !hasDns && output && output.trim().length > 0; // raw text present
-  const show3D = hasText && activeTool === 'recon'; // only recon output triggers 3D visuals
+  const hasText = !hasDns && output && output.trim().length > 0;
   
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   const [target, setTarget] = useState('');
@@ -160,7 +159,7 @@ export default function Tools() {
         {/* 3D ENGINE VIEWPORT */}
         <div style={{ 
           height: '80vh', position: 'relative',
-          border: (hasDns || show3D) ? `2px solid ${accent}` : 'none',
+          border: (hasDns || hasText) ? `2px solid ${accent}` : 'none',
           transition: 'border 0.5s ease'
         }}>
           <Canvas key={canvasKey} camera={{ position: [0, 0, 8], fov: 45 }}>
