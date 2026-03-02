@@ -160,7 +160,7 @@ export default function Tools() {
         <div style={{ height: '80vh', position: 'relative' }}>
           <Canvas
             key={canvasKey}
-            camera={{ position: [0, 0, 6], fov: 45 }}
+            camera={{ position: [0, 0, 8], fov: 45 }}
             gl={{ antialias: true }}
             onCreated={({ gl }) => {
               gl.domElement.addEventListener('webglcontextlost', (e) => {
