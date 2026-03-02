@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 import CyberScene from '../canvas/CyberScene'
-import { OrbitControls } from '@react-three/drei';
 import { useToolStore } from '../state/useToolStore'
 import { getTheme } from '../utils/theme'
 
@@ -14,9 +14,10 @@ export default function Tools() {
     output, 
     appendOutput, 
     clearOutput,
-    setDnsData // Added from updated store
+    setDnsData 
   } = useToolStore()
 
+  // Store Selectors for Conditional UI
   const dnsData = useToolStore((s) => s.dnsData);
   const hasDns = dnsData && dnsData.length > 0;
   const hasText = !hasDns && output && output.trim().length > 0;
@@ -27,20 +28,26 @@ export default function Tools() {
   const [canvasKey, setCanvasKey] = useState(0);
   const terminalRef = useRef(null);
 
+  // Auto-scroll terminal
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [output]);
 
+  // Reset on tool change
   useEffect(() => {
     setTarget('');
     clearOutput();
-    if (activeTool === 'recon') {
-      setSubTool('nmap');
-    }
+    // Default subtools per module
+    if (activeTool === 'recon') setSubTool('nmap');
+    if (activeTool === 'exploit') setSubTool('headers');
   }, [activeTool, clearOutput]);
 
+  /**
+   * CORE LOGIC: handleExecute
+   * Orchestrates the bridge between Vercel and Railway C2
+   */
   const handleExecute = async () => {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
     
@@ -54,7 +61,8 @@ export default function Tools() {
       const payload = { 
         target, 
         tool: activeTool,
-        subtool: activeTool === 'recon' ? subTool : null 
+        // Routes subtool for both RECON and EXPLOIT modules
+        subtool: (activeTool === 'recon' || activeTool === 'exploit') ? subTool : null 
       };
 
       const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
@@ -70,7 +78,7 @@ export default function Tools() {
 
       let accumulatedOutput = '';
 
-      // attempt streaming first (not all environments support it)
+      // Stream Handling with Fallback
       if (response.body && response.body.getReader) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -82,32 +90,25 @@ export default function Tools() {
           appendOutput(chunk);
         }
       } else {
-        // fallback for non-streaming (some browsers / servers)
         accumulatedOutput = await response.text();
         appendOutput(accumulatedOutput);
       }
 
-      // debug info about what we fetched
-      console.log('handleExecute done reading, activeTool=', activeTool, 'subTool=', subTool);
-      console.log('raw accumulatedOutput:', accumulatedOutput);
-
       // --- 3D VISUALIZATION LOGIC ---
       if (activeTool === 'recon' && subTool === 'dns') {
-        // Parse the accumulated text for DNS records. Host output can vary between
-        // "name has address x.x.x.x" and the typical "name TTL IN TYPE VALUE".
         const lines = accumulatedOutput.split('\n');
         const dnsRecords = lines.flatMap(line => {
           const trimmed = line.trim();
           if (!trimmed) return [];
           const parts = trimmed.split(/\s+/);
 
-          // handle "foo has address 1.2.3.4"
+          // Pattern 1: "name has address x.x.x.x"
           const hasIdx = parts.indexOf('has');
           if (hasIdx > 0 && parts[hasIdx + 1] === 'address') {
             return [{ name: parts[0], type: 'A', val: parts[hasIdx + 2] }];
           }
 
-          // handle structured records with TTL IN
+          // Pattern 2: Structured "name TTL IN TYPE VALUE"
           if (parts.length >= 5 && parts[2] === 'IN') {
             return [{ name: parts[0], type: parts[3], val: parts[4] }];
           }
@@ -115,10 +116,8 @@ export default function Tools() {
           return [];
         }).filter(r => r.val && r.type);
 
-        console.log('parsed dnsRecords', dnsRecords);
+        console.log('DEBUG: DNS_RECORDS_PARSED', dnsRecords);
         setDnsData(dnsRecords);
-        // verify that the store actually holds the data after setting
-        console.log('store after setDnsData', useToolStore.getState().dnsData);
       }
       
       appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
@@ -128,9 +127,6 @@ export default function Tools() {
       setExecuting(false);
     }
   };
-
-  // ... (getBtnStyle and return block remain exactly the same as your previous version)
-  // Just ensure CyberScene is within the Canvas as you already have it.
 
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
@@ -150,59 +146,31 @@ export default function Tools() {
   };
 
   return (
-    <div style={{ 
-      width: '100%',
-      minHeight: '100vh', 
-      background: themeBg, 
-      color: themeColor, 
-      fontFamily: 'monospace',
-      paddingTop: '3.5rem', 
-      paddingBottom: '3.5rem',
-      transition: 'background 0.5s ease'
-    }}>
+    <div style={{ width: '100%', minHeight: '100vh', background: themeBg, color: themeColor, fontFamily: 'monospace', paddingTop: '3.5rem', paddingBottom: '3.5rem' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr' }}>
         
-        {/* LEFT SIDE: 3D ENGINE VIEWPORT */}
-        <div style={{ height: '80vh', position: 'relative',
-                       border: (hasDns || hasText) ? `2px solid ${accent}` : 'none' }}>
-          <Canvas
-            key={canvasKey}
-            camera={{ position: [0, 0, 8], fov: 45 }}
-            gl={{ antialias: true }}
-            onCreated={({ gl }) => {
-              gl.domElement.addEventListener('webglcontextlost', (e) => {
-                e.preventDefault();
-                console.warn('WEBSEC_RENDERER: Context lost. Attempting recovery...');
-                setTimeout(() => setCanvasKey(k => k + 1), 1000);
-              });
-            }}
-          >
+        {/* 3D ENGINE VIEWPORT */}
+        <div style={{ 
+          height: '80vh', position: 'relative',
+          border: (hasDns || hasText) ? `2px solid ${accent}` : 'none',
+          transition: 'border 0.5s ease'
+        }}>
+          <Canvas key={canvasKey} camera={{ position: [0, 0, 8], fov: 45 }}>
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
-            <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
-            {/* allow user to orbit/zoom the scene */}
             <OrbitControls enablePan={false} enableZoom={true} />
             <CyberScene />
           </Canvas>
 
-          <div style={{ 
-            position: 'absolute', bottom: '20px', left: '20px', 
-            color: themeColor, opacity: 0.6, fontSize: '0.75rem',
-            borderLeft: `2px solid ${accent}`, paddingLeft: '10px'
-          }}>
+          <div style={{ position: 'absolute', bottom: '20px', left: '20px', color: themeColor, opacity: 0.6, fontSize: '0.75rem', borderLeft: `2px solid ${accent}`, paddingLeft: '10px' }}>
             SYSTEM_STATUS: {isExecuting ? 'EXECUTING...' : 'IDLE'} <br />
             TARGET_ADDR: {target || 'AWAITING_INPUT'} <br />
-            ACTIVE_GEOMETRY: {activeTool.toUpperCase()} <br />
-            PIPELINE_V3: SECURE_LINK
+            ACTIVE_GEOMETRY: {activeTool.toUpperCase()}
           </div>
         </div>
 
-        {/* RIGHT SIDE: CONTROL PANEL */}
-        <div style={{ 
-          display: 'flex', flexDirection: 'column', 
-          padding: '0 4rem', gap: '1.5rem',
-          borderLeft: `1px solid ${accent}33`
-        }}>
+        {/* CONTROL PANEL */}
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 4rem', gap: '1.5rem', borderLeft: `1px solid ${accent}33` }}>
           
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {['recon', 'exploit', 'osint', 'audit'].map(t => (
@@ -214,28 +182,31 @@ export default function Tools() {
 
           <div style={{ border: `1px solid ${accent}`, padding: '1rem', background: panelBg }}>
             <h2 style={{ color: themeColor, margin: 0, fontSize: '1.8rem', letterSpacing: '5px' }}>
-              {activeTool.toUpperCase()}{activeTool === 'recon' ? ` - ${subTool.toUpperCase()}` : ''}
+              {activeTool.toUpperCase()}{activeTool === 'recon' || activeTool === 'exploit' ? ` - ${subTool.toUpperCase()}` : ''}
             </h2>
           </div>
 
-          {activeTool === 'recon' && (
+          {/* Contextual Subtool Selector */}
+          {(activeTool === 'recon' || activeTool === 'exploit') && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
               <select
                 value={subTool}
                 onChange={(e) => setSubTool(e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.5)',
-                  border: `1px solid ${accent}`,
-                  padding: '0.8rem',
-                  color: themeColor,
-                  fontFamily: 'monospace',
-                  outline: 'none'
-                }}
+                style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${accent}`, padding: '0.8rem', color: themeColor, fontFamily: 'monospace' }}
               >
-                <option value="nmap">nmap (Port Discovery)</option>
-                <option value="whois">whois (Domain Registry)</option>
-                <option value="dns">dns (Host Lookup)</option>
+                {activeTool === 'recon' ? (
+                  <>
+                    <option value="nmap">nmap (Port Discovery)</option>
+                    <option value="whois">whois (Registry)</option>
+                    <option value="dns">dns (Topological Map)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="headers">Passive Header Audit</option>
+                    <option value="clickjack">Clickjacking PoC</option>
+                  </>
+                )}
               </select>
             </div>
           )}
@@ -246,90 +217,24 @@ export default function Tools() {
               type="text"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isExecuting) {
-                  handleExecute();
-                }
-              }}
-              placeholder={activeTool === 'audit' ? 'SCANNING_INTERNAL_NODE...' : 'IP_ADDRESS / DOMAIN'}
-              disabled={activeTool === 'audit' || isExecuting}
-              style={{
-                background: activeTool === 'audit' ? '#111' : 'rgba(0,0,0,0.5)',
-                border: `1px solid ${accent}`,
-                padding: '0.8rem',
-                color: themeColor,
-                fontFamily: 'monospace',
-                outline: 'none',
-                opacity: isExecuting ? 0.5 : 1
-              }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !isExecuting) handleExecute(); }}
+              placeholder="IP_ADDRESS / DOMAIN"
+              disabled={isExecuting}
+              style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${accent}`, padding: '0.8rem', color: themeColor, fontFamily: 'monospace' }}
             />
           </div>
           
-          <div 
-            ref={terminalRef}
-            style={{ 
-              height: '300px', 
-              background: '#020202', 
-              border: `1px solid ${accent}`, 
-              padding: '1rem', 
-              overflowY: 'auto',
-              whiteSpace: 'pre-wrap',
-              fontSize: '0.85rem',
-              color: accent,
-              boxShadow: `inset 0 0 20px #000`,
-              lineHeight: '1.4'
-            }}
-          >
+          <div ref={terminalRef} style={{ height: '300px', background: '#020202', border: `1px solid ${accent}`, padding: '1rem', overflowY: 'auto', whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: accent }}>
             {output || '--- WEBSEC_STRIKE_TERMINAL READY ---'}
           </div>
 
-          {activeTool === 'audit' ? (
-            <button
-              style={{
-                background: themeColor,
-                border: `2px solid ${accent}`,
-                color: '#000',
-                padding: '1.2rem',
-                cursor: 'pointer',
-                fontWeight: '900',
-                fontSize: '0.9rem',
-                letterSpacing: '2px',
-                boxShadow: `0 0 20px ${accent}66`
-              }}
-              onClick={() => {
-                const content = output || 'NO_AUDIT_DATA_FOUND';
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `audit-report-${Date.now()}.txt`;
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-            >
-              DOWNLOAD_FORENSIC_REPORT
-            </button>
-          ) : (
-            <button 
-              disabled={isExecuting}
-              style={{
-                background: isExecuting ? 'transparent' : themeColor,
-                border: `2px solid ${accent}`,
-                color: isExecuting ? accent : '#000',
-                padding: '1.2rem',
-                cursor: isExecuting ? 'not-allowed' : 'pointer',
-                fontWeight: '900',
-                fontSize: '0.9rem',
-                letterSpacing: '2px',
-                boxShadow: isExecuting ? 'none' : `0 0 25px ${accent}66`,
-                transition: 'all 0.3s ease'
-              }} 
-              onClick={handleExecute}
-            >
-              {isExecuting ? 'TRANSMITTING_PAYLOAD...' : 'EXECUTE_OPERATIONS_V1.0'}
-            </button>
-          )}
-          
+          <button 
+            disabled={isExecuting}
+            onClick={handleExecute}
+            style={{ background: isExecuting ? 'transparent' : themeColor, border: `2px solid ${accent}`, color: isExecuting ? accent : '#000', padding: '1.2rem', cursor: isExecuting ? 'not-allowed' : 'pointer', fontWeight: '900' }}
+          >
+            {isExecuting ? 'TRANSMITTING...' : 'EXECUTE_STRIKE_V3.0'}
+          </button>
         </div>
       </div>
     </div>
