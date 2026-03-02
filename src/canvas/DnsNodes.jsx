@@ -16,12 +16,15 @@ export default function DnsNodes() {
 
       {/* Branching Nodes for each DNS Record */}
       {dnsData.map((record, i) => {
-        // Calculate a circular layout for the nodes
-        const angle = (i / dnsData.length) * Math.PI * 2;
+        // spread nodes on a sphere instead of a flat circle
         const radius = 3.5;
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        const pos = [x, y, 0];
+        const theta = (i / dnsData.length) * Math.PI * 2;          // around equator
+        const phi = Math.acos(1 - 2 * (i + 0.5) / dnsData.length); // from pole to pole
+
+        const x = Math.sin(phi) * Math.cos(theta) * radius;
+        const y = Math.sin(phi) * Math.sin(theta) * radius;
+        const z = Math.cos(phi) * radius;
+        const pos = [x, y, z];
 
         // Color coding based on record type
         const nodeColor = record.type === 'A' ? '#ff0055' : 
@@ -45,7 +48,7 @@ export default function DnsNodes() {
 
             {/* Optional: Small Label for the IP/Value */}
             <Text
-              position={[x * 1.2, y * 1.2, 0]}
+              position={[x * 1.15, y * 1.15, z * 1.15]}
               fontSize={0.12}
               color="white"
               font="/fonts/GeistMono-Bold.ttf" // Use your project's mono font path
