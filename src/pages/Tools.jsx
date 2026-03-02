@@ -127,7 +127,7 @@ export default function Tools() {
         setDnsData(dnsRecords);
       }
       
-      appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
+      appendOutput(`\n\n[SUCCESS] Operation completed successfully.\n`);
     } catch (error) {
       appendOutput(`\n[FATAL] C2_LINK_FAILED: ${error.message}\n`);
     } finally {
@@ -253,6 +253,7 @@ export default function Tools() {
                 else if (line.startsWith('[ERROR]')) style = { color: '#FFD700' }; // gold
                 else if (line.startsWith('[FATAL]') || line.startsWith('[SYSTEM_ERROR]')) style = { color: '#FFA500' };
                 else if (line.startsWith('[SUCCESS]')) style = { color: '#00FF00' };
+                else if (line.startsWith('[FOUND]')) style = { color: '#00CED1' }; // turquoise for osint hits
                 return (<div key={idx} style={style}>{line || '\u00A0'}</div>);
               })
             ) : (
