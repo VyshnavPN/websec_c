@@ -28,5 +28,8 @@ export const useToolStore = create((set) => ({
   }),
 
   // Action to push new DNS records to the 3D scene
-  setDnsData: (data) => set({ dnsData: data }),
+  setDnsData: (data) => {
+    console.debug('useToolStore.setDnsData called', data);
+    set({ dnsData: data });
+  },
 }))

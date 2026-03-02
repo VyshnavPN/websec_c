@@ -3,11 +3,12 @@ import { Sphere, Line, Text } from '@react-three/drei';
 import { useToolStore } from '../state/useToolStore';
 
 export default function DnsNodes() {
-  const { dnsData } = useToolStore();
+  // select only dnsData so we re-render only when it changes
+  const dnsData = useToolStore((state) => state.dnsData);
 
-  // extra debug whenever the data changes
+  // Debug when received new data
   React.useEffect(() => {
-    console.debug('useEffect dnsData updated', dnsData);
+    console.debug('DnsNodes store subscription:', dnsData);
   }, [dnsData]);
 
   if (!dnsData || dnsData.length === 0) {

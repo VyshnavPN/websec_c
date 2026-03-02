@@ -113,6 +113,8 @@ export default function Tools() {
 
         console.log('parsed dnsRecords', dnsRecords);
         setDnsData(dnsRecords);
+        // verify that the store actually holds the data after setting
+        console.log('store after setDnsData', useToolStore.getState().dnsData);
       }
       
       appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
