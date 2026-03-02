@@ -198,38 +198,38 @@ export default function Tools() {
             </div>
           </div>
 
-          {/* Contextual Subtool Selector (always rendered for debugging) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
-            <select
-              value={subTool}
-              onChange={(e) => setSubTool(e.target.value)}
-              style={{
-                background: 'rgba(0,0,0,0.7)',
-                border: `2px solid ${accent}`,
-                padding: '0.8rem',
-                color: '#fff',
-                minWidth: '180px',
-                fontFamily: 'monospace',
-                zIndex: 10
-              }}
-            >
-              {activeTool === 'recon' ? (
-                <>
-                  <option value="nmap">nmap (Port Discovery)</option>
-                  <option value="whois">whois (Registry)</option>
-                  <option value="dns">dns (Topological Map)</option>
-                </>
-              ) : activeTool === 'exploit' ? (
-                <>
-                  <option value="headers">Passive Header Audit</option>
-                  <option value="clickjack">Clickjacking PoC</option>
-                </>
-              ) : (
-                <option value="">N/A</option>
-              )}
-            </select>
-          </div>
+          {/* Contextual Subtool Selector */}
+          {(activeTool === 'recon' || activeTool === 'exploit') && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
+              <select
+                value={subTool}
+                onChange={(e) => setSubTool(e.target.value)}
+                style={{
+                  background: 'rgba(0,0,0,0.7)',
+                  border: `2px solid ${accent}`,
+                  padding: '0.8rem',
+                  color: '#fff',
+                  minWidth: '180px',
+                  fontFamily: 'monospace',
+                  zIndex: 10
+                }}
+              >
+                {activeTool === 'recon' ? (
+                  <>
+                    <option value="nmap">nmap (Port Discovery)</option>
+                    <option value="whois">whois (Registry)</option>
+                    <option value="dns">dns (Topological Map)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="headers">Passive Header Audit</option>
+                    <option value="clickjack">Clickjacking PoC</option>
+                  </>
+                )}
+              </select>
+            </div>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} DEFINE_TARGET:</span>
