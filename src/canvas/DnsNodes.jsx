@@ -5,7 +5,11 @@ import { useToolStore } from '../state/useToolStore';
 export default function DnsNodes() {
   const { dnsData } = useToolStore();
 
-  if (!dnsData || dnsData.length === 0) return null;
+  if (!dnsData || dnsData.length === 0) {
+    console.debug('DnsNodes: no data to render', dnsData);
+    return null;
+  }
+  console.debug('DnsNodes rendering', dnsData.length, 'records');
 
   return (
     <group>
@@ -13,6 +17,10 @@ export default function DnsNodes() {
       <Sphere args={[0.15, 32, 32]} position={[0, 0, 0]}>
         <meshStandardMaterial color="#00f3ff" emissive="#00f3ff" emissiveIntensity={2} />
       </Sphere>
+      {/* display count in center for debugging */}
+      <Text position={[0, 0, 0]} fontSize={0.2} color="#fff" anchorX="center" anchorY="middle">
+        {dnsData.length} records
+      </Text>
 
       {/* Branching Nodes for each DNS Record */}
       {dnsData.map((record, i) => {
@@ -41,8 +49,8 @@ export default function DnsNodes() {
               opacity={0.4} 
             />
             
-            {/* The Record Node */}
-            <Sphere args={[0.08, 16, 16]} position={pos}>
+            {/* The Record Node (bumped size for visibility) */}
+            <Sphere args={[0.12, 16, 16]} position={pos}>
               <meshStandardMaterial color={nodeColor} emissive={nodeColor} emissiveIntensity={1.5} />
             </Sphere>
 

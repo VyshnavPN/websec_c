@@ -78,21 +78,29 @@ export default function Tools() {
       
       // --- 3D VISUALIZATION LOGIC ---
       if (activeTool === 'recon' && subTool === 'dns') {
-        // Parse the accumulated text for DNS records
+        // Parse the accumulated text for DNS records. Host output can vary between
+        // "name has address x.x.x.x" and the typical "name TTL IN TYPE VALUE".
         const lines = accumulatedOutput.split('\n');
-        const dnsRecords = lines
-          .filter(line => line.includes('IN')) // DNS lines usually contain 'IN'
-          .map(line => {
-            const parts = line.split(/\s+/);
-            // Indexing based on 'host -a' output format
-            return { 
-              name: parts[0], 
-              type: parts[3], 
-              val: parts[4] 
-            };
-          })
-          .filter(record => record.val && record.type);
+        const dnsRecords = lines.flatMap(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return [];
+          const parts = trimmed.split(/\s+/);
 
+          // handle "foo has address 1.2.3.4"
+          const hasIdx = parts.indexOf('has');
+          if (hasIdx > 0 && parts[hasIdx + 1] === 'address') {
+            return [{ name: parts[0], type: 'A', val: parts[hasIdx + 2] }];
+          }
+
+          // handle structured records with TTL IN
+          if (parts.length >= 5 && parts[2] === 'IN') {
+            return [{ name: parts[0], type: parts[3], val: parts[4] }];
+          }
+
+          return [];
+        }).filter(r => r.val && r.type);
+
+        console.log('parsed dnsRecords', dnsRecords);
         setDnsData(dnsRecords);
       }
       
