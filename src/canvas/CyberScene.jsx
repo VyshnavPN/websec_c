@@ -49,10 +49,10 @@ export default function CyberScene() {
     const targetColor = new THREE.Color(hovered ? accent : themeColor);
     meshRef.current.material.color.lerp(targetColor, 0.1);
 
-    // rotate DNS sphere slowly to reveal depth
+    // rotate DNS sphere slowly around Y only for better readability
     if (dnsRef.current && dnsData && dnsData.length > 0) {
-      dnsRef.current.rotation.y += delta * 0.3;
-      dnsRef.current.rotation.x += delta * 0.15;
+      dnsRef.current.rotation.y += delta * 0.2;
+      // leave x/z static so labels don't spin upside‑down
     }
   });
 

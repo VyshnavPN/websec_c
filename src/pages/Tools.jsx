@@ -241,6 +241,11 @@ export default function Tools() {
               type="text"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isExecuting) {
+                  handleExecute();
+                }
+              }}
               placeholder={activeTool === 'audit' ? 'SCANNING_INTERNAL_NODE...' : 'IP_ADDRESS / DOMAIN'}
               disabled={activeTool === 'audit' || isExecuting}
               style={{
