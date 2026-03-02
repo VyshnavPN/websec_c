@@ -16,6 +16,10 @@ export default function Tools() {
     clearOutput,
     setDnsData // Added from updated store
   } = useToolStore()
+
+  const dnsData = useToolStore((s) => s.dnsData);
+  const hasDns = dnsData && dnsData.length > 0;
+  const hasText = !hasDns && output && output.trim().length > 0;
   
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   const [target, setTarget] = useState('');
@@ -159,7 +163,8 @@ export default function Tools() {
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr' }}>
         
         {/* LEFT SIDE: 3D ENGINE VIEWPORT */}
-        <div style={{ height: '80vh', position: 'relative' }}>
+        <div style={{ height: '80vh', position: 'relative',
+                       border: (hasDns || hasText) ? `2px solid ${accent}` : 'none' }}>
           <Canvas
             key={canvasKey}
             camera={{ position: [0, 0, 8], fov: 45 }}

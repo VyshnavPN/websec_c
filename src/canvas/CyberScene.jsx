@@ -9,7 +9,6 @@ import DnsNodes from './DnsNodes'; // 1. Import the new component
 export default function CyberScene() {
   const meshRef = useRef();
   const dnsRef = useRef(); // reference to the DNS node group
-  const frameRef = useRef(); // rotating outline around results
   const [hovered, setHover] = useState(false);
   
   const activeTool = useToolStore((state) => state.activeTool);
@@ -57,11 +56,6 @@ export default function CyberScene() {
     if (dnsRef.current && hasDns) {
       dnsRef.current.rotation.y += delta * 0.2;
       // leave x/z static so labels don't spin upside‑down
-    }
-
-    // rotate the decorative frame when we have anything visible
-    if (frameRef.current && (hasDns || hasText)) {
-      frameRef.current.rotation.y += delta * 0.1;
     }
   });
 
@@ -111,14 +105,6 @@ export default function CyberScene() {
 
       {/* 5. VISUALIZATION AREA */}
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-        {(hasDns || hasText) && (
-          <mesh ref={frameRef}>
-            {/* simple rectangular wireframe as a frame around contents */}
-            <boxGeometry args={[7, 4, 0.02]} />
-            <meshBasicMaterial color={accent} wireframe />
-          </mesh>
-        )}
-
         {hasDns ? (
           <group ref={dnsRef}>
             <DnsNodes />
