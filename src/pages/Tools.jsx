@@ -42,6 +42,8 @@ export default function Tools() {
     // Default subtools per module
     if (activeTool === 'recon') setSubTool('nmap');
     if (activeTool === 'exploit') setSubTool('headers');
+
+    console.debug('TOOLS_PAGE: activeTool=', activeTool, 'subTool=', subTool);
   }, [activeTool, clearOutput]);
 
   /**
@@ -162,6 +164,7 @@ export default function Tools() {
             <CyberScene />
           </Canvas>
 
+
           <div style={{ position: 'absolute', bottom: '20px', left: '20px', color: themeColor, opacity: 0.6, fontSize: '0.75rem', borderLeft: `2px solid ${accent}`, paddingLeft: '10px' }}>
             SYSTEM_STATUS: {isExecuting ? 'EXECUTING...' : 'IDLE'} <br />
             TARGET_ADDR: {target || 'AWAITING_INPUT'} <br />
@@ -186,30 +189,30 @@ export default function Tools() {
             </h2>
           </div>
 
-          {/* Contextual Subtool Selector */}
-          {(activeTool === 'recon' || activeTool === 'exploit') && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
-              <select
-                value={subTool}
-                onChange={(e) => setSubTool(e.target.value)}
-                style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${accent}`, padding: '0.8rem', color: themeColor, fontFamily: 'monospace' }}
-              >
-                {activeTool === 'recon' ? (
-                  <>
-                    <option value="nmap">nmap (Port Discovery)</option>
-                    <option value="whois">whois (Registry)</option>
-                    <option value="dns">dns (Topological Map)</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="headers">Passive Header Audit</option>
-                    <option value="clickjack">Clickjacking PoC</option>
-                  </>
-                )}
-              </select>
-            </div>
-          )}
+          {/* Contextual Subtool Selector (always rendered for debugging) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
+            <select
+              value={subTool}
+              onChange={(e) => setSubTool(e.target.value)}
+              style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${accent}`, padding: '0.8rem', color: themeColor, fontFamily: 'monospace' }}
+            >
+              {activeTool === 'recon' ? (
+                <>
+                  <option value="nmap">nmap (Port Discovery)</option>
+                  <option value="whois">whois (Registry)</option>
+                  <option value="dns">dns (Topological Map)</option>
+                </>
+              ) : activeTool === 'exploit' ? (
+                <>
+                  <option value="headers">Passive Header Audit</option>
+                  <option value="clickjack">Clickjacking PoC</option>
+                </>
+              ) : (
+                <option value="">N/A</option>
+              )}
+            </select>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} DEFINE_TARGET:</span>
