@@ -12,11 +12,11 @@ export default function Tools() {
     setExecuting, 
     output, 
     appendOutput, 
-    clearOutput 
+    clearOutput,
+    setDnsData // Added from updated store
   } = useToolStore()
   
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
-  
   const [target, setTarget] = useState('');
   const [subTool, setSubTool] = useState('nmap');
   const [canvasKey, setCanvasKey] = useState(0);
@@ -36,10 +36,6 @@ export default function Tools() {
     }
   }, [activeTool, clearOutput]);
 
-  /**
-   * CORE LOGIC: handleExecute
-   * Fixed payload delivery to ensure subtools (whois/dns) trigger correctly.
-   */
   const handleExecute = async () => {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
     
@@ -50,7 +46,6 @@ export default function Tools() {
     appendOutput(`[PIPELINE] Establishing encrypted bridge to C2 server...\n\n`);
 
     try {
-      // FIX: Ensure the payload object is constructed with all necessary parameters
       const payload = { 
         target, 
         tool: activeTool,
@@ -60,7 +55,7 @@ export default function Tools() {
       const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload) // SENDING COMPLETE PAYLOAD
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -70,21 +65,46 @@ export default function Tools() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let accumulatedOutput = ''; // Track full string for parsing
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        appendOutput(decoder.decode(value));
+        const chunk = decoder.decode(value);
+        accumulatedOutput += chunk;
+        appendOutput(chunk);
+      }
+      
+      // --- 3D VISUALIZATION LOGIC ---
+      if (activeTool === 'recon' && subTool === 'dns') {
+        // Parse the accumulated text for DNS records
+        const lines = accumulatedOutput.split('\n');
+        const dnsRecords = lines
+          .filter(line => line.includes('IN')) // DNS lines usually contain 'IN'
+          .map(line => {
+            const parts = line.split(/\s+/);
+            // Indexing based on 'host -a' output format
+            return { 
+              name: parts[0], 
+              type: parts[3], 
+              val: parts[4] 
+            };
+          })
+          .filter(record => record.val && record.type);
+
+        setDnsData(dnsRecords);
       }
       
       appendOutput(`\n\n[SUCCESS] Operation completed successfully.`);
     } catch (error) {
       appendOutput(`\n[FATAL] C2_LINK_FAILED: ${error.message}\n`);
-      console.error("DETAILED_CONNECTION_ERROR:", error); 
     } finally {
       setExecuting(false);
     }
   };
+
+  // ... (getBtnStyle and return block remain exactly the same as your previous version)
+  // Just ensure CyberScene is within the Canvas as you already have it.
 
   const getBtnStyle = (toolName) => {
     const isActive = activeTool === toolName;
