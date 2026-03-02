@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Float } from '@react-three/drei'; // Added for smooth movement
+import { Float, Text } from '@react-three/drei'; // Added for smooth movement and text rendering
 import { useToolStore } from '../state/useToolStore';
 import { getTheme } from '../utils/theme';
 import DnsNodes from './DnsNodes'; // 1. Import the new component
@@ -13,6 +13,7 @@ export default function CyberScene() {
   
   const activeTool = useToolStore((state) => state.activeTool);
   const dnsData = useToolStore((state) => state.dnsData); // 2. Watch DNS data
+  const output = useToolStore((state) => state.output); // text output from tools
   const setActiveTool = useToolStore((state) => state.setActiveTool);
   const { primary: themeColor, accent } = getTheme(activeTool);
 
@@ -30,11 +31,13 @@ export default function CyberScene() {
     const baseScale = new THREE.Vector3(1, 1, 1);
     const hoverScale = new THREE.Vector3(1.2, 1.2, 1.2);
     const targetScale = hovered ? hoverScale : baseScale;
-    
-    // 3. HIDE MAIN MESH IF DNS MAP IS ACTIVE
-    // If we have DNS data, we shrink the main shape to make room for the map
-    if (dnsData && dnsData.length > 0) {
-        targetScale.set(0, 0, 0);
+
+    // determine whether we have something to display in place of the mesh
+    const hasDns = dnsData && dnsData.length > 0;
+    const hasText = !hasDns && output && output.trim().length > 0;
+
+    if (hasDns || hasText) {
+      targetScale.set(0, 0, 0);
     }
 
     meshRef.current.scale.lerp(targetScale, 0.08);
@@ -50,7 +53,7 @@ export default function CyberScene() {
     meshRef.current.material.color.lerp(targetColor, 0.1);
 
     // rotate DNS sphere slowly around Y only for better readability
-    if (dnsRef.current && dnsData && dnsData.length > 0) {
+    if (dnsRef.current && hasDns) {
       dnsRef.current.rotation.y += delta * 0.2;
       // leave x/z static so labels don't spin upside‑down
     }
@@ -73,6 +76,12 @@ export default function CyberScene() {
     else setActiveTool('recon');
   };
 
+  const hasDns = dnsData && dnsData.length > 0;
+  const hasText = !hasDns && output && output.trim().length > 0;
+  const displayOutput = hasText
+    ? output.split('\n').slice(-20).join('\n')
+    : '';
+
   return (
     <>
       {/* 4. MAIN CENTRAL GEOMETRY */}
@@ -94,12 +103,24 @@ export default function CyberScene() {
         />
       </mesh>
 
-      {/* 5. THE VISUAL DNS MAP */}
-      {/* We wrap it in a Float to give it a "floating in space" look */}
+      {/* 5. VISUALIZATION AREA */}
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-        <group ref={dnsRef}>
-          <DnsNodes />
-        </group>
+        {hasDns ? (
+          <group ref={dnsRef}>
+            <DnsNodes />
+          </group>
+        ) : hasText ? (
+          <Text
+            fontSize={0.24}
+            color={themeColor}
+            maxWidth={6}
+            lineHeight={1.2}
+            anchorX="center"
+            anchorY="middle"
+          >
+            {displayOutput}
+          </Text>
+        ) : null}
       </Float>
     </>
   );
