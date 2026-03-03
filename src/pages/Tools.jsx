@@ -42,6 +42,7 @@ export default function Tools() {
     // Default subtools per module
     if (activeTool === 'recon') setSubTool('nmap');
     if (activeTool === 'exploit') setSubTool('headers');
+    if (activeTool === 'audit') setSubTool('nmap'); // quick scan by default
 
     console.debug('TOOLS_PAGE: activeTool=', activeTool, 'subTool=', subTool);
   }, [activeTool, clearOutput]);
@@ -71,8 +72,8 @@ export default function Tools() {
       const payload = { 
         target, 
         tool: activeTool,
-        // Routes subtool for both RECON and EXPLOIT modules
-        subtool: (activeTool === 'recon' || activeTool === 'exploit') ? subTool : null 
+        // Routes subtool for recon, exploit and audit modules
+        subtool: (activeTool === 'recon' || activeTool === 'exploit' || activeTool === 'audit') ? subTool : null 
       };
 
       const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
@@ -202,7 +203,7 @@ export default function Tools() {
           </div>
 
           {/* Contextual Subtool Selector */}
-          {(activeTool === 'recon' || activeTool === 'exploit') && (
+          {(activeTool === 'recon' || activeTool === 'exploit' || activeTool === 'audit') && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{'>'} SELECT_SUBTOOL:</span>
               <select
@@ -224,10 +225,16 @@ export default function Tools() {
                     <option value="whois">whois (Registry)</option>
                     <option value="dns">dns (Topological Map)</option>
                   </>
-                ) : (
+                ) : activeTool === 'exploit' ? (
                   <>
                     <option value="headers">Passive Header Audit</option>
                     <option value="clickjack">Clickjacking PoC</option>
+                  </>
+                ) : (
+                  // audit
+                  <>
+                    <option value="nmap">nmap (Quick Scan)</option>
+                    <option value="nikto">nikto (Audit Engine)</option>
                   </>
                 )}
               </select>
