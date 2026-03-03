@@ -27,7 +27,13 @@ export default function Navbar({ themeColor }) {
         <Link to="/" style={{ color: themeColor || 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
       </div>
       <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
-        <Link to="/" style={linkStyle} onClick={() => window.location.reload()}>HOME</Link>
+        {/* use plain anchor so we can reliably force a full page navigation
+            instead of relying on React Router's Link which updates before the
+            reload occurs (causing the reload to happen on the old page). */}
+        <a href="/" style={linkStyle} onClick={(e) => {
+            e.preventDefault();
+            window.location.href = '/';
+        }}>HOME</a>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
         {user ? (
           <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${accent}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
