@@ -3,9 +3,7 @@ import { auth } from '../state/firebase';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  sendPasswordResetEmail,
-  GoogleAuthProvider,
-  signInWithPopup 
+  sendPasswordResetEmail 
 } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToolStore } from '../state/useToolStore';
@@ -15,9 +13,9 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Toggle state
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [info, setInfo] = useState(''); // For recovery success messages
+  const [info, setInfo] = useState('');
 
   const navigate = useNavigate();
   const activeTool = useToolStore((s) => s.activeTool);
@@ -36,16 +34,6 @@ export default function Auth() {
       navigate('/');
     } catch (err) {
       handleErrors(err);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      navigate('/');
-    } catch (err) {
-      setError('GOOGLE_LINK_FAILED: UPLINK_REJECTED');
     }
   };
 
@@ -92,38 +80,4 @@ export default function Auth() {
           <input type="email" placeholder="EMAIL_UPLINK" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
           
           <div style={{ position: 'relative' }}>
-            <input type={showPassword ? "text" : "password"} placeholder="ACCESS_CODE" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <span 
-              onClick={() => setShowPassword(!showPassword)} 
-              style={{ position: 'absolute', right: '10px', top: '30%', cursor: 'pointer', fontSize: '0.6rem', color: themeColor, opacity: 0.7 }}
-            >
-              {showPassword ? '[_HIDE_]' : '[_SHOW_]'}
-            </span>
-          </div>
-          
-          {error && <div style={{ color: '#ff4444', fontSize: '0.7rem', borderLeft: '2px solid #ff4444', paddingLeft: '5px' }}>{error}</div>}
-          {info && <div style={{ color: themeColor, fontSize: '0.7rem', borderLeft: `2px solid ${themeColor}`, paddingLeft: '5px' }}>{info}</div>}
-
-          <button type="submit" style={{ background: themeColor, color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px' }}>
-            {isLogin ? 'INITIALIZE_SESSION' : 'REGISTER_IDENTITY'}
-          </button>
-
-          <button type="button" onClick={handleGoogleSignIn} style={{ background: 'transparent', color: themeColor, border: `1px solid ${themeColor}`, padding: '0.8rem', cursor: 'pointer', fontSize: '0.7rem' }}>
-            [ AUTH_VIA_GOOGLE_UPLINK ]
-          </button>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <p onClick={() => setIsLogin(!isLogin)} style={{ fontSize: '0.6rem', cursor: 'pointer', opacity: 0.5 }}>
-              {isLogin ? '>_REQUEST_NEW_UPLINK' : '>_BACK_TO_LOGIN'}
-            </p>
-            {isLogin && (
-              <p onClick={handleForgotPassword} style={{ fontSize: '0.6rem', cursor: 'pointer', color: themeColor, opacity: 0.8 }}>
-                RECOVER_ACCESS_CODE?
-              </p>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+            <input type={showPassword ? "text" : "password"} placeholder="ACCESS_CODE" style={input
