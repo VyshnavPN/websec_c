@@ -9,6 +9,9 @@ export const useToolStore = create((set) => ({
   // 3D Visualization Data
   dnsData: [], // Stores objects like { name, type, val }
 
+  // Authentication State
+  user: null,        // { username, role, token }
+
   // Actions
   setActiveTool: (tool) => set({ 
     activeTool: tool, 
@@ -32,4 +35,14 @@ export const useToolStore = create((set) => ({
     console.debug('useToolStore.setDnsData called', data);
     set({ dnsData: data });
   },
-}))
+
+  // authentication helpers
+  setUser: (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
+  },
+  clearUser: () => {
+    localStorage.removeItem('user');
+    set({ user: null });
+  }
+,}))

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './state/firebase';
+// auth replaced by backend API
 import { useToolStore } from './state/useToolStore';
 import { getTheme } from './utils/theme';
 
@@ -9,13 +8,16 @@ import { getTheme } from './utils/theme';
 import Home from './pages/Home';
 import Tools from './pages/Tools';
 import Auth from './pages/Auth';
+import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 
 // Styles
 import './style.css';
 
 export default function App() {
-  const [user, setUser] = useState(null);
+  const storeUser = useToolStore((s) => s.user);
+  const setUser = useToolStore((s) => s.setUser);
+  const clearUser = useToolStore((s) => s.clearUser);
   const [loading, setLoading] = useState(true);
   const activeTool = useToolStore((s) => s.activeTool);
 
@@ -30,25 +32,14 @@ export default function App() {
     document.body.style.background = themeBg;
   }, [themeColor, themeBg, activeTool]);
 
+  // initialize user from localStorage once
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-
-    // fallback: if auth never responds within 5s, unblock UI to avoid permanent black screen
-    const timer = setTimeout(() => {
-      if (loading) {
-        console.warn('Firebase auth timeout – forcing load with user=', user);
-        setLoading(false);
-      }
-    }, 5000);
-
-    return () => {
-      unsubscribe();
-      clearTimeout(timer);
-    };
-  }, []);
+    const saved = localStorage.getItem('user');
+    if (saved) {
+      try { setUser(JSON.parse(saved)); } catch {}
+    }
+    setLoading(false);
+  }, [setUser]);
 
   if (loading) {
     return (
@@ -68,10 +59,13 @@ export default function App() {
           <Route path="/" element={<Home />} />
           
           {/* Tools requires auth */}
-          <Route path="/tools" element={user ? <Tools /> : <Navigate to="/auth" />} />
+          <Route path="/tools" element={storeUser ? <Tools /> : <Navigate to="/auth" />} />
 
           {/* Auth is only for logged-out users */}
-          <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/" />} />
+          <Route path="/auth" element={!storeUser ? <Auth /> : <Navigate to="/" />} />
+
+          {/* admin dashboard */}
+          <Route path="/dashboard/admin" element={storeUser && storeUser.role === 'admin' ? <Admin /> : <Navigate to="/" />} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
