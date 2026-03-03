@@ -80,4 +80,34 @@ export default function Auth() {
           <input type="email" placeholder="EMAIL_UPLINK" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
           
           <div style={{ position: 'relative' }}>
-            <input type={showPassword ? "text" : "password"} placeholder="ACCESS_CODE" style={input
+            <input type={showPassword ? "text" : "password"} placeholder="ACCESS_CODE" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <span 
+              onClick={() => setShowPassword(!showPassword)} 
+              style={{ position: 'absolute', right: '10px', top: '30%', cursor: 'pointer', fontSize: '0.6rem', color: themeColor, opacity: 0.7 }}
+            >
+              {showPassword ? '[_HIDE_]' : '[_SHOW_]'}
+            </span>
+          </div>
+          
+          {error && <div style={{ color: '#ff4444', fontSize: '0.7rem', borderLeft: '2px solid #ff4444', paddingLeft: '5px' }}>{error}</div>}
+          {info && <div style={{ color: themeColor, fontSize: '0.7rem', borderLeft: `2px solid ${themeColor}`, paddingLeft: '5px' }}>{info}</div>}
+
+          <button type="submit" style={{ background: themeColor, color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px', marginTop: '1rem' }}>
+            {isLogin ? 'INITIALIZE_SESSION' : 'REGISTER_IDENTITY'}
+          </button>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem', textAlign: 'center' }}>
+            <p onClick={() => setIsLogin(!isLogin)} style={{ fontSize: '0.6rem', cursor: 'pointer', opacity: 0.5 }}>
+              {isLogin ? '>_REQUEST_NEW_UPLINK' : '>_BACK_TO_LOGIN'}
+            </p>
+            {isLogin && (
+              <p onClick={handleForgotPassword} style={{ fontSize: '0.6rem', cursor: 'pointer', color: themeColor, opacity: 0.8 }}>
+                RECOVER_ACCESS_CODE?
+              </p>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
