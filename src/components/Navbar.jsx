@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { auth } from '../state/firebase';
+import { signOut } from 'firebase/auth';
 import { useToolStore } from '../state/useToolStore';
 import { getTheme } from '../utils/theme';
 
 export default function Navbar({ themeColor }) {
-  const user = useToolStore((s) => s.user);
-  const clearUser = useToolStore((s) => s.clearUser);
+  const user = auth.currentUser;
   // if themeColor not passed, derive from store
   const activeTool = useToolStore((s) => s.activeTool);
   const { accent } = getTheme(activeTool);
@@ -34,9 +35,8 @@ export default function Navbar({ themeColor }) {
             window.location.href = '/';
         }}>HOME</a>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
-        {user?.role === 'admin' && <Link to="/dashboard/admin" style={linkStyle}>ADMIN</Link>}
         {user ? (
-          <button onClick={() => { clearUser(); window.location.href='/'; }} style={{ background: 'transparent', border: `1px solid ${accent}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
+          <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${accent}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>
             LOGOUT
           </button>
         ) : (

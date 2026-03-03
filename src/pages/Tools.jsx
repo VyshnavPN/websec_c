@@ -15,8 +15,7 @@ export default function Tools() {
     appendOutput, 
     clearOutput,
     setDnsData 
-  } = useToolStore();
-  const user = useToolStore((s) => s.user);
+  } = useToolStore()
 
   // Store Selectors for Conditional UI
   const dnsData = useToolStore((s) => s.dnsData);
@@ -26,7 +25,6 @@ export default function Tools() {
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
   const [target, setTarget] = useState('');
   const [subTool, setSubTool] = useState('nmap');
-  const [suggestion, setSuggestion] = useState('');
   const [canvasKey, setCanvasKey] = useState(0);
   const terminalRef = useRef(null);
 
@@ -187,12 +185,10 @@ export default function Tools() {
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0 4rem', gap: '1.5rem', borderLeft: `1px solid ${accent}33` }}>
           
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {['recon', 'exploit', 'osint']
-              .concat((user?.role === 'pro' || user?.role === 'admin') ? ['audit'] : [])
-              .map(t => (
-                <button key={t} style={getBtnStyle(t)} onClick={() => setActiveTool(t)}>
-                  [ {t} ]
-                </button>
+            {['recon', 'exploit', 'osint', 'audit'].map(t => (
+              <button key={t} style={getBtnStyle(t)} onClick={() => setActiveTool(t)}>
+                [ {t} ]
+              </button>
             ))}
           </div>
 
@@ -281,29 +277,6 @@ export default function Tools() {
           >
             {isExecuting ? 'TRANSMITTING...' : 'EXECUTE_STRIKE_V3.0'}
           </button>
-          {(user?.role === 'pro' || user?.role === 'admin') && (
-            <div style={{ marginTop: '1rem' }}>
-              <textarea
-                placeholder="REQUEST_NEW_MODULE"
-                rows={3}
-                style={{ width: '100%', background: '#111', color: '#fff', fontFamily: 'monospace', padding: '0.5rem' }}
-                value={suggestion}
-                onChange={(e) => setSuggestion(e.target.value)}
-              />
-              <button onClick={async () => {
-                const token = useToolStore.getState().user?.token;
-                if (token && suggestion) {
-                  await fetch('/api/suggest', {
-                    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,suggestion})
-                  });
-                  setSuggestion('');
-                  appendOutput('[REQUEST_SENT] Thanks for the suggestion.\n');
-                }
-              }} style={{ marginTop:'0.5rem', background:themeColor, color:'#000', padding:'0.5rem 1rem' }}>
-                SUBMIT_REQUEST
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
