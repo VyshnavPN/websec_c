@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
 import { auth } from '../state/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  sendPasswordResetEmail,
+  GoogleAuthProvider,
+  signInWithPopup 
+} from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToolStore } from '../state/useToolStore';
 import { getTheme } from '../utils/theme';
-
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); 
+  const [showPassword, setShowPassword] = useState(false); // Toggle state
+  const [error, setError] = useState('');
+  const [info, setInfo] = useState(''); // For recovery success messages
+
   const navigate = useNavigate();
   const activeTool = useToolStore((s) => s.activeTool);
   const { primary: themeColor, bg: themeBg, accent, panelBg } = getTheme(activeTool);
 
   const handleAuth = async (e) => {
     e.preventDefault();
-    setError(''); 
+    setError('');
+    setInfo('');
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -26,14 +35,34 @@ export default function Auth() {
       }
       navigate('/');
     } catch (err) {
-      if (err.code === 'auth/invalid-credential') {
-        setError('ACCESS_DENIED: INVALID_CREDENTIALS');
-      } else if (err.code === 'auth/email-already-in-use') {
-        setError('IDENTITY_EXISTS: PROCEED_TO_LOGIN');
-      } else {
-        setError('SYSTEM_ERROR: UPLINK_UNSTABLE');
-      }
+      handleErrors(err);
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      navigate('/');
+    } catch (err) {
+      setError('GOOGLE_LINK_FAILED: UPLINK_REJECTED');
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return setError('ERROR: EMAIL_REQUIRED_FOR_RECOVERY');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setInfo('RECOVERY_LINK_SENT: CHECK_INBOX');
+    } catch (err) {
+      setError('RECOVERY_FAILED: TARGET_NOT_FOUND');
+    }
+  };
+
+  const handleErrors = (err) => {
+    if (err.code === 'auth/invalid-credential') setError('ACCESS_DENIED: INVALID_CREDENTIALS');
+    else if (err.code === 'auth/email-already-in-use') setError('IDENTITY_EXISTS: PROCEED_TO_LOGIN');
+    else setError('SYSTEM_ERROR: UPLINK_UNSTABLE');
   };
 
   const inputStyle = {
@@ -50,13 +79,7 @@ export default function Auth() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: themeBg || '#000', color: '#fff', fontFamily: 'monospace' }}>
-      
-      {/* Return Button Floating Top Left */}
-      <Link to="/" style={{ 
-        position: 'absolute', top: '2rem', left: '2rem', color: themeColor, 
-        textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '2px',
-        border: `1px solid ${themeColor}`, padding: '0.5rem 1rem'
-      }}>
+      <Link to="/" style={{ position: 'absolute', top: '2rem', left: '2rem', color: themeColor, textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '2px', border: `1px solid ${themeColor}`, padding: '0.5rem 1rem' }}>
         [ &lt; RETURN_TO_BASE ]
       </Link>
 
@@ -65,19 +88,40 @@ export default function Auth() {
           {isLogin ? '//_SECURE_LOGIN' : '//_ENROLL_NEW_AGENT'}
         </h2>
 
-        <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <input type="email" placeholder="EMAIL_UPLINK" style={inputStyle} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="ACCESS_CODE" style={inputStyle} onChange={(e) => setPassword(e.target.value)} required />
+        <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <input type="email" placeholder="EMAIL_UPLINK" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
           
-          {error && <div style={{ color: '#ff4444', fontSize: '0.7rem' }}>{error}</div>}
+          <div style={{ position: 'relative' }}>
+            <input type={showPassword ? "text" : "password"} placeholder="ACCESS_CODE" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <span 
+              onClick={() => setShowPassword(!showPassword)} 
+              style={{ position: 'absolute', right: '10px', top: '30%', cursor: 'pointer', fontSize: '0.6rem', color: themeColor, opacity: 0.7 }}
+            >
+              {showPassword ? '[_HIDE_]' : '[_SHOW_]'}
+            </span>
+          </div>
+          
+          {error && <div style={{ color: '#ff4444', fontSize: '0.7rem', borderLeft: '2px solid #ff4444', paddingLeft: '5px' }}>{error}</div>}
+          {info && <div style={{ color: themeColor, fontSize: '0.7rem', borderLeft: `2px solid ${themeColor}`, paddingLeft: '5px' }}>{info}</div>}
 
           <button type="submit" style={{ background: themeColor, color: '#000', border: 'none', padding: '1rem', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '2px' }}>
             {isLogin ? 'INITIALIZE_SESSION' : 'REGISTER_IDENTITY'}
           </button>
 
-          <p onClick={() => setIsLogin(!isLogin)} style={{ fontSize: '0.7rem', cursor: 'pointer', textAlign: 'center', opacity: 0.5 }}>
-            {isLogin ? '>_REQUEST_NEW_UPLINK' : '>_BACK_TO_LOGIN'}
-          </p>
+          <button type="button" onClick={handleGoogleSignIn} style={{ background: 'transparent', color: themeColor, border: `1px solid ${themeColor}`, padding: '0.8rem', cursor: 'pointer', fontSize: '0.7rem' }}>
+            [ AUTH_VIA_GOOGLE_UPLINK ]
+          </button>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+            <p onClick={() => setIsLogin(!isLogin)} style={{ fontSize: '0.6rem', cursor: 'pointer', opacity: 0.5 }}>
+              {isLogin ? '>_REQUEST_NEW_UPLINK' : '>_BACK_TO_LOGIN'}
+            </p>
+            {isLogin && (
+              <p onClick={handleForgotPassword} style={{ fontSize: '0.6rem', cursor: 'pointer', color: themeColor, opacity: 0.8 }}>
+                RECOVER_ACCESS_CODE?
+              </p>
+            )}
+          </div>
         </form>
       </div>
     </div>
