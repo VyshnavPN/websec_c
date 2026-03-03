@@ -42,7 +42,7 @@ export default function Tools() {
     // Default subtools per module
     if (activeTool === 'recon') setSubTool('nmap');
     if (activeTool === 'exploit') setSubTool('headers');
-    if (activeTool === 'audit') setSubTool('nmap'); // quick scan by default
+    if (activeTool === 'audit') setSubTool('nikto'); // only nikto audit engine
 
     console.debug('TOOLS_PAGE: activeTool=', activeTool, 'subTool=', subTool);
   }, [activeTool, clearOutput]);
@@ -231,9 +231,8 @@ export default function Tools() {
                     <option value="clickjack">Clickjacking PoC</option>
                   </>
                 ) : (
-                  // audit
+                  // audit: only nikto engine
                   <>
-                    <option value="nmap">nmap (Quick Scan)</option>
                     <option value="nikto">nikto (Audit Engine)</option>
                   </>
                 )}
