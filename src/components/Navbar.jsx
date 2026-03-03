@@ -27,7 +27,7 @@ export default function Navbar({ themeColor }) {
         <Link to="/" style={{ color: themeColor || 'white', textDecoration: 'none', fontSize: '1.2rem' }}>WEBSEC</Link>
       </div>
       <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
-        <Link to="/" style={linkStyle}>HOME</Link>
+        <Link to="/" style={linkStyle} onClick={() => window.location.reload()}>HOME</Link>
         <Link to="/tools" style={linkStyle}>TOOLS</Link>
         {user ? (
           <button onClick={() => signOut(auth)} style={{ background: 'transparent', border: `1px solid ${accent}`, color: '#fff', padding: '5px 15px', cursor: 'pointer', fontFamily: 'monospace' }}>

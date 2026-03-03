@@ -6,6 +6,19 @@ import Hero from '../components/Hero';
 export default function Home() {
   const activeTool = useToolStore((s) => s.activeTool);
   const { bg: bgColor, accent } = getTheme(activeTool);
+  const clearOutput = useToolStore((s) => s.clearOutput);
+  const setDnsData = useToolStore((s) => s.setDnsData);
+  const setActiveTool = useToolStore((s) => s.setActiveTool);
+
+  // when the Home page mounts we want to wipe any lingering terminal output
+  // and visual state.  this has the effect of giving the user a "fresh"
+  // landing page and prevents seeing previous scans when they navigate back.
+  React.useEffect(() => {
+    clearOutput();
+    setDnsData([]);
+    // optionally reset to default tool (recon) so banners align with home
+    setActiveTool('recon');
+  }, [clearOutput, setDnsData, setActiveTool]);
 
   return (
     <div style={{ width: '100%', minHeight: '100vh', position: 'relative', overflow: 'auto', background: bgColor, color: accent }}>

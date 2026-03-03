@@ -77,11 +77,13 @@ export default function CyberScene() {
   };
 
   const hasDns = dnsData && dnsData.length > 0;
-  // text should only be presented when there's no DNS data and we actually
-  // have output from a recon run; excluding exploit/osint prevents the huge
-  // red wall-of-text that covers the canvas.
+  // text should be shown whenever we have output (and no DNS records).
+  // previously we limited this to recon only; the requirement is to paint
+  // results on the canvas for *all* scans just like recon does.  limit the
+  // number of lines so long dumps (exploit stack traces, osint walls) don't
+  // swamp the geometry.
   const hasText = !hasDns && output && output.trim().length > 0;
-  const show3DText = hasText && activeTool === 'recon';
+  const show3DText = hasText; // no longer restrict by activeTool
   const displayOutput = show3DText
     ? output.split('\n').slice(-20).join('\n')
     : '';

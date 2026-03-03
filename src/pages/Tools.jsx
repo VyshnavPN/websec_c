@@ -59,7 +59,10 @@ export default function Tools() {
     if (!target) return alert("CRITICAL_ERROR: TARGET_SPECIFICATION_REQUIRED");
     
     setExecuting(true);
+    // always reset previous visual data so that an old dns map doesn't linger
+    // and the canvas picks up fresh text for every scan
     clearOutput();
+    setDnsData([]);
     appendOutput(`[INIT] Initializing ${activeTool.toUpperCase()} sequence...\n`);
     appendOutput(`[TARGET] ${target}\n`);
     appendOutput(`[PIPELINE] Establishing encrypted bridge to C2 server...\n\n`);
