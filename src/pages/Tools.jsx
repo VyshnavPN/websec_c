@@ -76,7 +76,7 @@ export default function Tools() {
         subtool: (activeTool === 'recon' || activeTool === 'exploit' || activeTool === 'audit') ? subTool : null 
       };
 
-      const response = await fetch('https://websecbackend-production.up.railway.app/api/scan', {
+      const response = await fetch('https://websec-backend.onrender.com/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
